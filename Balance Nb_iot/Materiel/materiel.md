@@ -7,18 +7,18 @@ L’objectif est de fournir un système autonome et étanche, capable de transme
 
 ## 🧩 Liste des composants
 
-| Composant | Description | Quantité | Remarques |
-|------------|--------------|-----------|------------|
-| **Carte TTGO7080G (LilyGO)** | Module principal NB-IoT + microcontrôleur ESP32 | 1 | Gère la communication et la logique du système |
-| **Plaquette Beehive_Scale** | Interface de mesure de charge (capteur de poids) | 1 | Spécifique au projet balance |
-| **Boutons poussoirs 12 mm** | Commandes manuelles (ex. reset, calibration) | 2 | Étanches de préférence |
-| **LED 6 mm** | Indication d’état (alimentation, transmission, erreur) | 1 | Couleur au choix |
-| **Sonde de température DS18B20** | Mesure la température ambiante | 1 | Version étanche recommandée |
-| **Soupape** | Équilibrage de pression du boîtier | 1 | Permet d’éviter la condensation |
-| **Joint torique 2 mm** | Étanchéité du couvercle ou des connecteurs | 1 | Silicone ou nitrile selon usage |
-| **Boîtier imprimé 3D** | Support et protection des composants | 1 | Fichier STL à venir |
-| **Panneau solaire 1W / 6V max** | Alimentation autonome via batterie | 1 | Compatible avec TTGO7080G |
-| **Connecteurs étanches** | Connexions pour capteurs et alimentation | Plusieurs | Type IP67 ou supérieur recommandé |
+| Image | Composant | Description | Quantité | Remarques |
+|:------:|------------|--------------|-----------|------------|
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO7080G (LilyGO)** | Module principal NB-IoT + microcontrôleur ESP32 | 1 | Gère la communication et la logique du système |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **Plaquette Beehive_Scale** | Interface de mesure de charge (capteur de poids) | 1 | Spécifique au projet balance |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Commandes manuelles (ex. reset, calibration) | 2 | Étanches de préférence |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/led.png" width="80"/> | **LED 6 mm** | Indication d’état (alimentation, transmission, erreur) | 1 | Couleur au choix |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/DS18b20.png" width="80"/> | **Sonde de température DS18B20** | Mesure la température ambiante | 1 | Version étanche recommandée |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vent.png" width="80"/> | **Soupape** | Équilibrage de pression du boîtier | 1 | Permet d’éviter la condensation |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/oring.png" width="80"/> | **Joint torique 2 mm** | Étanchéité du couvercle ou des connecteurs | 1 | Silicone ou nitrile selon usage |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Na4%20Mavin.png" width="80"/> | **Boîtier imprimé 3D / capteur** | Support et protection des composants | 1 | Fichier STL à venir |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/solar.png" width="80"/> | **Panneau solaire 1W / 6V max** | Alimentation autonome via batterie | 1 | Compatible avec TTGO7080G |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%205%20pin.png" width="80"/> | **Connecteurs étanches** | Connexions pour capteurs et alimentation | Plusieurs | Type IP67 ou supérieur recommandé |
 
 ---
 
@@ -72,6 +72,6 @@ Vous êtes libres de l’utiliser, le modifier et le partager, tant que la licen
 
 ---
 
-**Auteur :** [TonNom]  
+**Auteur :** [Ratamuse](https://github.com/Ratamuse)  
 **Projet :** Balance connectée NB-IoT  
 **Version :** v1.0  
