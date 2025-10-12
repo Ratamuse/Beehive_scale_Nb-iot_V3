@@ -30,8 +30,8 @@ L’objectif est de fournir un système **autonome, étanche et solaire**, capab
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/18650.png" width="80"/> | **Batterie Li-Ion 18650 (3000 mAh)** | Alimentation interne | 1 | Avec protection BMS intégrée |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/gaine%20thermo.png" width="80"/> | **Gaine thermorétractable** | Protection des connexions | - | Pour câbles et connecteurs |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG 26** | Câblage interne | - | Pour boutons et LED |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO.png" width="80"/> | **Carte SD 16 Go** | Enregistrement local des données | 1 | Format FAT32 recommandé |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SIM.png" width="80"/> | **Carte SIM NB-IoT** | Abonnement réseau | 1 | Prépayée ou M2M |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/micro%20sd.jpg" width="80"/> | **Carte SD 16 Go** | Enregistrement local des données | 1 | Format FAT32 recommandé |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/sim.png" width="80"/> | **Carte SIM NB-IoT** | Abonnement réseau | 1 | Prépayée ou M2M |
 
 ---
 
