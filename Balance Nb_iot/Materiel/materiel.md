@@ -11,6 +11,8 @@ L’objectif est de fournir un système **autonome, étanche et solaire**, capab
 |:------:|------------|--------------|-----------|------------|
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO7080G (LilyGO)** | Module principal NB-IoT + microcontrôleur ESP32 | 1 | Gère la communication et la logique du système |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **Plaquette Beehive_Scale** | Interface de mesure de charge (capteur de poids) | 1 | Spécifique au projet balance |
+2 borniers 5 broches phoenix contact 1989777 à souder sur la plaquette Beehive_Scale
+1 bornier 9 broches phoenix contact 1989816 à souder sur la plaquette Beehive_Scale
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Commandes manuelles (reset, calibration) | 2 | Étanches de préférence |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/led.png" width="80"/> | **LED 6 mm** | Indication d’état (alimentation, transmission, erreur) | 1 | Couleur au choix |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/DS18b20.png" width="80"/> | **Sonde de température DS18B20** | Mesure la température ambiante | 1 | Version étanche recommandée |
@@ -32,7 +34,7 @@ L’objectif est de fournir un système **autonome, étanche et solaire**, capab
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG 26** | Câblage interne | - | Pour boutons et LED |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/micro%20sd.jpg" width="80"/> | **Carte SD 16 Go** | Enregistrement local des données | 1 | Format FAT32 recommandé |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/sim.png" width="80"/> | **Carte SIM NB-IoT** | Abonnement réseau | 1 | Prépayée ou M2M |
-
+boîtier imprimé 3d
 ---
 
 ## ⚖️ Liste des composants – Structure de la balance  
