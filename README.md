@@ -19,8 +19,10 @@
 6. [Téléchargement](#telechargement)
 7. [Firmware](#firmware)
 8. [Mode d'emploi](#mode-demploi)
-9. [Licence](#licence)
-10. [Auteur](#auteur)
+9. [Partie Web et IoT](#web-iot)
+10. [Licence](#licence)
+11. [Auteur](#auteur)
+
 
 ---
 
@@ -33,7 +35,7 @@ Cette carte embarque :
 - un **MCU ESP32-S3**
 - un modem **NB-IoT SIM7080G**
 - un **chargeur solaire** pour batterie **18650 Li-Ion**
-- un lecteur de **carte microSD** utile au projet
+- un **GPS**
 
 Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
 Une sonde de température **DS18B20** complète l’ensemble.
@@ -223,6 +225,39 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 Pour consulter le **mode d'emploi complet** de la Balance Connectée NB-IoT, rendez-vous ici :  
 👉 [Mode d'emploi](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/Mode%20d'emploi)
+
+
+<a name="web-iot"></a>
+## 🌐 Partie Web et IoT
+
+La **balance connectée** communique via un **serveur web embarqué** et envoie ses données au format **MQTT** vers un **broker Mosquitto**.  
+
+Les données envoyées par MQTT comprennent :
+
+- ⚖️ **Poids** : mesures des deux balances  
+- 🌡️ **Température** : température ambiante mesurée par la sonde DS18B20  
+- 🔋 **Batterie** : pourcentage de charge de la batterie interne  
+- 📶 **Signal NB-IoT** : force du signal réseau  
+- 📍 **Position** : coordonnées GPS exactes et position approximative (mise à jour 1 fois par jour)
+
+
+
+Voici le flux des données :  
+
+- 📨 **Envoi des mesures** : la balance publie ses données en MQTT.  
+- ⚙️ **Traitement** : les messages peuvent être formatés et transformés par **Telegraf**.  
+- 🗄️ **Stockage** : les données sont enregistrées dans une **base InfluxDB v2**.  
+- 📊 **Visualisation** : Grafana permet de suivre les mesures en **temps réel** et d’afficher les historiques.  
+
+> 💡 Exemple : les fichiers MQTT peuvent être traités comme vous le souhaitez, selon vos besoins.  
+
+Toutes les données peuvent être :  
+
+- 🖥️ **Stockées localement** sur un serveur dédié.  
+- ☁️ Ou hébergées **dans le cloud** via un prestataire pour un accès distant et sécurisé.  
+
+Cette architecture flexible permet d’**adapter le système** à différents besoins, tout en gardant la possibilité d’une **supervision centralisée ou locale**.
+
 
 
 <a name="licence"></a>
