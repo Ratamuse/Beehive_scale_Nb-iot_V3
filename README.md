@@ -37,7 +37,7 @@ Cette carte embarque :
 - un **chargeur solaire** pour batterie **18650 Li-Ion**
 - un **GPS**
 
-Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
+Deux balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
 Une sonde de température **DS18B20** complète l’ensemble.
 
 Pour faciliter les branchements, un **circuit imprimé dédié** est disponible. Il comprend :
