@@ -51,8 +51,10 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 🌐 Un serveur web embarqué vous permet de calibrer vos balances et de configurer l’adresse et le port pour vos messages MQTT.
 
 
-![PCB](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/pcb.jpg)
-![TTGO](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg)
+![PCB](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg)
+![TTGO](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg)
+![Station](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/station.jpg)
+![Balances](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/balances.jpg)
 
 ---
 
