@@ -11,7 +11,7 @@ Ce circuit imprimé est à souder sur la carte TTGO Sim7080G.
 Vous trouverez ci dessous les liens pour:
 
 - [Liste du materiel](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/Materiel/materiel.md)
-- [Fichier .STL pour impression 3D](https://github.com/Ratamuse/Harpe/tree/main/Harpe%20ruches%2FFichiers%203d%20%C3%A0%20imprimer)
+- [Fichiers STL](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/Fichiers%20stl)
 - [Aide au montage](https://github.com/Ratamuse/Harpe/blob/main/Harpe%20ruches/Montage/Construction.md)
 - [Fichiers nécessaires pour fabriquer le circuit imprimé](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/PCB)
 
