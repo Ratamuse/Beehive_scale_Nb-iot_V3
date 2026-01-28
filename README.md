@@ -13,6 +13,6 @@ Vous trouverez ci dessous les liens pour:
 - [Liste du materiel](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/Materiel/materiel.md)
 - [Fichier .STL pour impression 3D](https://github.com/Ratamuse/Harpe/tree/main/Harpe%20ruches%2FFichiers%203d%20%C3%A0%20imprimer)
 - [Aide au montage](https://github.com/Ratamuse/Harpe/blob/main/Harpe%20ruches/Montage/Construction.md)
-- [Fichiers nécessaires pour fabriquer le circuit imprimé de la harpe](https://github.com/Ratamuse/Harpe/tree/main/Harpe%20ruches/Fichier%20Kicad)
+- [Fichiers nécessaires pour fabriquer le circuit imprimé](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/PCB)
 
 **[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://paypal.me/GNUVarioE?country.x=FR&locale.x=fr_FR) Cette harpe vous plait et est efficace. Payez moi un café! ;-) [![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://paypal.me/GNUVarioE?country.x=FR&locale.x=fr_FR)**
