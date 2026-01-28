@@ -132,7 +132,7 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | Élément | Coût |
 |---|---:|
 | Connecteurs SP13 2 pins | 11 € |
-| Connecteurs SP13 2 pins | 28 € |
+| Connecteurs SP13 5 pins | 28 € |
 | Peson 200 kg | 250 € |
 | **Sous-total Balances** | **754 €** |
 
