@@ -45,6 +45,9 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 👉 Ce circuit imprimé est à souder sur la carte **TTGO SIM7080G**.
 
+🌐 Un serveur web embarqué vous permet de calibrer vos balances et de configurer l’adresse et le port pour vos messages MQTT.
+
+
 ![PCB](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/pcb.jpg)
 ![TTGO](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg)
 
