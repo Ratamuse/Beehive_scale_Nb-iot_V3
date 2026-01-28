@@ -11,18 +11,19 @@
 
 ## 📚 Table des matières
 
-1. [Présentation du projet](#-présentation-du-projet)
-2. [Composants — Boîtier électronique](#-liste-des-composants--boîtier-électronique)
-3. [Composants — Structure de la balance](#-liste-des-composants--structure-de-la-balance)
-4. [Estimation des coûts (janvier 2026)](#-estimation-des-coûts--5-stations-et-10-balances-janvier-2026)
-5. [Assemblage](#-étapes-dassemblage)
-6. [Téléchargement](#-téléchargement)
-7. [Firmware](#-Firmware)
-8. [Licence](#-licence)
-9. [Auteur](#-auteur)
+1. [Présentation du projet](#presentation-du-projet)
+2. [Composants — Boîtier électronique](#liste-des-composants-boitier-electronique)
+3. [Composants — Structure de la balance](#liste-des-composants-structure-de-la-balance)
+4. [Estimation des coûts (5 stations et 10 balances)](#estimation-des-couts-5-stations-et-10-balances)
+5. [Étapes d’assemblage](#etapes-dassemblage)
+6. [Téléchargement](#telechargement)
+7. [Firmware](#firmware)
+8. [Licence](#licence)
+9. [Auteur](#auteur)
 
 ---
 
+<a name="presentation-du-projet"></a>
 ## 🧠 Présentation du projet
 
 Balances connectées au réseau **NB-IoT** via la carte **TTGO SIM7080G** de LilyGO.  
@@ -49,6 +50,7 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+<a name="liste-des-composants-boitier-electronique"></a>
 ## 🧩 Liste des composants – Boîtier électronique
 
 | Image | Composant | Description | Qté | Remarques |
@@ -82,6 +84,7 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+<a name="liste-des-composants-structure-de-la-balance"></a>
 ## ⚖️ Liste des composants – Structure de la balance
 
 | Image | Composant | Description | Qté | Remarques |
@@ -99,6 +102,7 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+<a name="estimation-des-couts-5-stations-et-10-balances"></a>
 ## 💰 Estimation des coûts — 5 stations et 10 balances (janvier 2026)
 
 > ⚠️ Estimation indicative : les prix varient selon fournisseurs, quantités et frais de port.
@@ -180,20 +184,20 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+<a name="etapes-dassemblage"></a>
 ## ⚙️ Étapes d’assemblage
 
 *A faire.*
 
 ---
 
+<a name="telechargement"></a>
 ## 📥 Téléchargements
 
 ### 🔌 Fichiers PCB
 
 - **Dossier PCB (schémas + gerbers + BOM)**  
   👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/PCB
-
----
 
 ### 🧩 Fichiers STL pour impression 3D
 
@@ -202,12 +206,15 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+<a name="firmware"></a>
 ## 💾 Firmware
 
 - **Dossier Firmware**  
   👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/Firmware
+
 ---
 
+<a name="licence"></a>
 ## 📜 Licence
 
 Ce projet est distribué sous licence **MIT**.  
@@ -215,9 +222,10 @@ Vous êtes libres de l’utiliser, le modifier et le partager, tant que la licen
 
 ---
 
+<a name="auteur"></a>
 ## 👤 Auteur
 
 **Auteur :** [Ratamuse](https://github.com/Ratamuse)  
 **Projet :** Balance Connectée NB-IoT  
 **Version :** v1.0  
-**Année :** 2025
+**Année :** 2026
