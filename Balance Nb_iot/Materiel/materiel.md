@@ -10,55 +10,71 @@
 ---
 
 ## 📚 Table des matières
+
 1. [Présentation du projet](#-présentation-du-projet)
 2. [Composants — Boîtier électronique](#-liste-des-composants--boîtier-électronique)
 3. [Composants — Structure de la balance](#-liste-des-composants--structure-de-la-balance)
-4. [Assemblage](#-étapes-dassemblage)
-5. [Alimentation & Autonomie](#-alimentation--autonomie)
-6. [Connectivité](#-connectivité)
-7. [Fichiers 3D](#-fichiers-3d)
-8. [Évolutions prévues](#-évolutions-prévues)
-9. [Licence](#-licence)
-10. [Auteur](#-auteur)
+4. [Estimation des coûts (janvier 2026)](#-estimation-des-coûts--5-stations-et-10-balances-janvier-2026)
+5. [Assemblage](#-étapes-dassemblage)
+6. [Téléchargement](#-téléchargement)
+7. [Licence](#-licence)
+8. [Auteur](#-auteur)
 
 ---
 
 ## 🧠 Présentation du projet
 
-Ce projet décrit la conception d’un **boîtier électronique intelligent** pour une **balance connectée NB-IoT**, basée sur la carte **TTGO SIM7080G (LilyGO)**.  
-L’objectif est de proposer une solution **autonome, robuste et étanche**, capable de **mesurer le poids et la température**, puis de **transmettre les données via le réseau NB-IoT**.
+Balances connectées au réseau **NB-IoT** via la carte **TTGO SIM7080G** de LilyGO.  
+Cette carte embarque :
 
-Le système est alimenté par **panneau solaire** et **batterie Li-Ion**, et conçu pour une installation extérieure (ex. : ruche, silo, plateforme logistique).
+- un **MCU ESP32-S3**
+- un modem **NB-IoT SIM7080G**
+- un **chargeur solaire** pour batterie **18650 Li-Ion**
+- un lecteur de **carte microSD** utile au projet
+
+Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
+Une sonde de température **DS18B20** complète l’ensemble.
+
+Pour faciliter les branchements, un **circuit imprimé dédié** est disponible. Il comprend :
+
+- 2 convertisseurs **HX711**
+- tous les connecteurs nécessaires (balances, sonde, bouton Wi-Fi, ON/OFF, LED)
+- un **watchdog externe** pour relancer la carte principale en cas de plantage
+
+👉 Ce circuit imprimé est à souder sur la carte **TTGO SIM7080G**.
+
+![PCB](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/pcb.jpg)
+![TTGO](https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/blob/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg)
 
 ---
 
 ## 🧩 Liste des composants – Boîtier électronique
 
 | Image | Composant | Description | Qté | Remarques |
-|:------:|------------|--------------|:--:|------------|
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO SIM7080G (LilyGO)** | Module principal NB-IoT + ESP32 | 1 | Communication, gestion d’énergie |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale** | Interface capteur de charge | 1 | Spécifique au projet |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989777.png" width="80"/> | **Bornier 5 broches Phoenix 1989777** | Connexions capteurs | 2 | À souder sur la plaquette |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989816.png" width="80"/> | **Bornier 9 broches Phoenix 1989816** | Connexions capteurs | 1 | À souder |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Reset / Calibration | 2 | Étanches IP67 |
+|:--:|---|---|:--:|---|
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO SIM7080G (LilyGO)** | Module principal NB-IoT + ESP32 | 1 | Communication + gestion énergie |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale** | Interface capteurs de charge | 1 | Spécifique au projet |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989777.png" width="80"/> | **Bornier Phoenix 1989777 (5 broches)** | Connexions capteurs | 2 | À souder sur le PCB |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989816.png" width="80"/> | **Bornier Phoenix 1989816 (9 broches)** | Connexions capteurs | 1 | À souder sur le PCB |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Reset / calibration | 2 | Étanches IP67 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/led.png" width="80"/> | **LED 6 mm** | Indication d’état | 1 | Couleur libre |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/DS18b20.png" width="80"/> | **Sonde DS18B20** | Température ambiante | 1 | Étanche |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vent.png" width="80"/> | **Soupape d’équilibrage** | Évite la condensation | 1 | IP67 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/oring.png" width="80"/> | **Joint torique Ø2 mm** | Étanchéité couvercle | 1 | Silicone ou nitrile |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/panneau%20solaire.png" width="80"/> | **Panneau solaire 1W / 6V** | Alimentation solaire | 1 | 100×80 mm |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/panneau%20solaire.png" width="80"/> | **Panneau solaire 1W / 6V** | Alimentation solaire | 1 | ~100×80 mm |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%205%20pin.png" width="80"/> | **Connecteurs étanches 5 pins** | Connexion balance | Plusieurs | IP67 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%202%20pin.png" width="80"/> | **Connecteurs étanches 2 pins** | Connexion solaire | Plusieurs | IP67 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/insert.png" width="80"/> | **Inserts laiton M3** | Fixation boîtier 3D | 6 | À insérer à chaud |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/o-lube.png" width="80"/> | **Graisse silicone** | Lubrification joints | - | Améliore étanchéité |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/o-lube.png" width="80"/> | **Graisse silicone** | Lubrification joints | - | Améliore l’étanchéité |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vis%20TTGO.png" width="80"/> | **Vis de fixation TTGO** | Fixation carte | 4 | Inox |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/ipx.png" width="80"/> | **Câble IPX → SMA-K (5 cm)** | Liaison antenne | 1 | Pour module SIM7080G |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Antenna.png" width="80"/> | **Antenne NB-IoT** | Transmission réseau | 1 | SMA externe |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Antenna.png" width="80"/> | **Antenne NB-IoT / 4G** | Transmission réseau | 1 | SMA externe |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/cable.png" width="80"/> | **Câble 2 brins (2 m)** | Connexion solaire | 1 | Étanche |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/aimants.png" width="80"/> | **Aimants 12×3 mm** | Fixation panneau solaire | 2 | Néodyme |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/PG7.png" width="80"/> | **Presse-étoupe PG7 (12 mm)** | Passage câble | 1 | IP68 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/18650.png" width="80"/> | **Batterie Li-Ion 18650 (3000 mAh)** | Alimentation interne | 1 | Avec BMS |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/gaine%20thermo.png" width="80"/> | **Gaine thermorétractable** | Protection connexions | - | Étanchéité |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG 26** | Câblage interne | - | Pour LED, boutons |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG26** | Câblage interne | - | LED, boutons |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/micro%20sd.jpg" width="80"/> | **Carte microSD 16 Go** | Stockage local | 1 | FAT32 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/sim.png" width="80"/> | **Carte SIM NB-IoT** | Accès réseau | 1 | M2M ou prépayée |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/boîtier%20TTGO.png" width="80"/> | **Boîtier imprimé 3D (PETG)** | Conteneur principal | 1 | Étanche et modulaire |
@@ -68,7 +84,7 @@ Le système est alimenté par **panneau solaire** et **batterie Li-Ion**, et con
 ## ⚖️ Liste des composants – Structure de la balance
 
 | Image | Composant | Description | Qté | Remarques |
-|:------:|------------|--------------|:--:|------------|
+|:--:|---|---|:--:|---|
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Na4%20Mavin.png" width="80"/> | **Capteurs de charge NA4 Mavin** | Mesure du poids | 2 | 100 ou 200 kg |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x60.png" width="80"/> | **Profilé alu 30×60 Type B** | Structure principale | 2 | 480 mm |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x30.png" width="80"/> | **Profilé alu 30×30 Type B** | Structure secondaire | 4 | 430 mm |
@@ -82,61 +98,106 @@ Le système est alimenté par **panneau solaire** et **batterie Li-Ion**, et con
 
 ---
 
+## 💰 Estimation des coûts — 5 stations et 10 balances (janvier 2026)
+
+> ⚠️ Estimation indicative : les prix varient selon fournisseurs, quantités et frais de port.
+
+### Balances (x10)
+
+#### Motedis.fr
+
+| Élément | Coût |
+|---|---:|
+| Kit Motedis | 465 € TTC |
+
+#### Aliexpress
+
+| Élément | Coût |
+|---|---:|
+| Connecteurs SP13 2 pins | 11 € |
+| Connecteurs SP13 2 pins | 28 € |
+| Peson 200 kg | 250 € |
+| **Sous-total Balances** | **754 €** |
+
+---
+
+### Stations (x5)
+
+#### Aliexpress
+
+| Élément | Coût |
+|---|---:|
+| Carte TTGO SIM7080G | 200 € |
+| Sonde température DS18B20 | 4,3 € |
+| Câble IPX | 2,5 € |
+| Antenne 4G | 4,5 € |
+| Câble panneau solaire | 7 € |
+| Aimant | 4,2 € |
+| Reniflard | 4 € |
+| Bouton poussoir | 5 € |
+| Vis boîtier | 1,85 € |
+| Vis TTGO | 1,8 € |
+| LED rouge 3V | 6 € |
+| Joint torique 2 mm × 5 m | 3,3 € |
+| Câble 28 AWG | 1 € |
+| Gaine thermo | 1 € |
+| Colliers | 0,5 € |
+| Inserts laiton | 1,8 € |
+
+#### Mouser
+
+| Élément | Coût |
+|---|---:|
+| Panneau solaire 1W | 20,5 € |
+| Connecteurs 5 pins | 8 € |
+| Connecteurs 12 pins | 9,7 € |
+| FDP | 20 € *(ou 0 € si commande > 50 €)* |
+
+#### JLCPCB
+
+| Élément | Coût |
+|---|---:|
+| PCB | 54 € |
+| *(108 € pour 10 cartes)* | |
+
+#### Divers
+
+| Élément | Coût |
+|---|---:|
+| 5 SIM NB-IoT Bouygues Telecom | 90 € |
+| Impression 3D PETG | 40 € |
+| Vernis de tropicalisation | 5 € |
+
+---
+
+### Total
+
+| Total | Coût |
+|---|---:|
+| **Total global** | **1230 €** |
+| **Coût moyen (par station)** | **246 €** |
+
+---
+
 ## ⚙️ Étapes d’assemblage
 
-1. **Montage électronique :**  
-   - Fixer la carte **TTGO** et la **Beehive_Scale** dans le boîtier.  
-   - Câbler les boutons, LED et sonde DS18B20.  
-
-2. **Étanchéité :**  
-   - Poser le **joint torique** et la **soupape**.  
-   - Appliquer la **graisse silicone**.  
-
-3. **Tests :**  
-   - Vérifier tension, polarité, communication NB-IoT.  
-
-4. **Montage final :**  
-   - Fermer le boîtier.  
-   - Installer les **capteurs de charge** sur la structure aluminium.  
-   - Effectuer la **calibration à vide et en charge connue**.
+*A faire.*
 
 ---
 
-## 🔋 Alimentation & Autonomie
+## 📥 Téléchargements
 
-| Élément | Spécifications |
-|----------|----------------|
-| **Source principale** | Panneau solaire 1 W / 6 V |
-| **Stockage énergie** | Batterie Li-Ion 18650 (3000 mAh) |
-| **Gestion de charge** | Intégrée sur la carte TTGO |
-| **Autonomie estimée** | Jusqu’à 3 semaines sans soleil |
+### 🔌 Fichiers PCB
+
+- **Dossier PCB (schémas + gerbers + BOM)**  
+  👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/PCB
 
 ---
 
-## 📡 Connectivité
+### 🧩 Fichiers STL pour impression 3D
 
-| Élément | Spécifications |
-|----------|----------------|
-| **Réseau** | NB-IoT (LTE Cat NB1) |
-| **Module** | SIM7080G intégré à la TTGO |
-| **Antenne** | SMA externe |
-| **Carte SIM** | M2M ou prépayée |
-
----
-
-## 🖨️ Fichiers 3D
-
-- [📁 Boîtier principal (STL)](./3d/boitier_balance.stl) *(à venir)*  
-- [📁 Support capteur (STL)](./3d/support_capteur.stl) *(optionnel)*  
-
----
-
-## 🚀 Évolutions prévues
-
-- 🔌 Schéma électronique détaillé  
-- 💻 Code firmware ESP32 + NB-IoT  
-- ⚖️ Guide de calibration complet  
-- ☁️ Intégration Cloud (API → serveur)
+- **Dossier STL**  
+  👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/Fichiers%20stl
 
 ---
 
@@ -153,6 +214,3 @@ Vous êtes libres de l’utiliser, le modifier et le partager, tant que la licen
 **Projet :** Balance Connectée NB-IoT  
 **Version :** v1.0  
 **Année :** 2025
-
----
-
