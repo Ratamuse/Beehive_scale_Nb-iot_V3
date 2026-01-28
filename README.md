@@ -17,8 +17,9 @@
 4. [Estimation des coûts (janvier 2026)](#-estimation-des-coûts--5-stations-et-10-balances-janvier-2026)
 5. [Assemblage](#-étapes-dassemblage)
 6. [Téléchargement](#-téléchargement)
-7. [Licence](#-licence)
-8. [Auteur](#-auteur)
+7. [Firmware](#-Firmware)
+8. [Licence](#-licence)
+9. [Auteur](#-auteur)
 
 ---
 
