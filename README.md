@@ -91,7 +91,6 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/18650.png" width="80"/> | **Batterie Li-Ion 18650 (3000 mAh)** | Alimentation interne | 1 |  |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/gaine%20thermo.png" width="80"/> | **Gaine thermorétractable** | Protection connexions | - | Étanchéité |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG26** | Câblage interne | - | LED, boutons |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/micro%20sd.jpg" width="80"/> | **Carte microSD 16 Go** | Stockage local | 1 | FAT32 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/sim.png" width="80"/> | **Carte SIM NB-IoT** | Accès réseau | 1 | M2M ou prépayée |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/boîtier%20TTGO.png" width="80"/> | **Boîtier imprimé 3D (PETG)** | Conteneur principal | 1 | Étanche et modulaire |
 
