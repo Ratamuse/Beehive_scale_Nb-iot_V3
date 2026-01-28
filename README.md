@@ -202,6 +202,12 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 
 ---
 
+## 💾 Firmware
+
+- **Dossier Firmware**  
+  👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/Firmware
+---
+
 ## 📜 Licence
 
 Ce projet est distribué sous licence **MIT**.  
