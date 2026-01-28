@@ -37,7 +37,7 @@ Cette carte embarque :
 - un **chargeur solaire** pour batterie **18650 Li-Ion**
 - un **GPS**
 
-Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
+Deux balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
 Une sonde de température **DS18B20** complète l’ensemble.
 
 Pour faciliter les branchements, un **circuit imprimé dédié** est disponible. Il comprend :
@@ -73,23 +73,23 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989777.png" width="80"/> | **Bornier Phoenix 1989777 (5 broches)** | Connexions capteurs | 2 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989816.png" width="80"/> | **Bornier Phoenix 1989816 (9 broches)** | Connexions capteurs | 1 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Reset / calibration | 2 | Étanches IP67 |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/led.png" width="80"/> | **LED 6 mm** | Indication d’état | 1 | Couleur libre |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/DS18b20.png" width="80"/> | **Sonde DS18B20** | Température ambiante | 1 | Étanche |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/led.png" width="80"/> | **LED 6 mm** | Indication d’état | 1 |  |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/DS18b20.png" width="80"/> | **Sonde DS18B20** | Température ambiante | 1 |  |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vent.png" width="80"/> | **Soupape d’équilibrage** | Évite la condensation | 1 | IP67 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/oring.png" width="80"/> | **Joint torique Ø2 mm** | Étanchéité couvercle | 1 | Silicone ou nitrile |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/panneau%20solaire.png" width="80"/> | **Panneau solaire 1W / 6V** | Alimentation solaire | 1 | ~100×80 mm |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%205%20pin.png" width="80"/> | **Connecteurs étanches 5 pins** | Connexion balance | Plusieurs | IP67 |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%202%20pin.png" width="80"/> | **Connecteurs étanches 2 pins** | Connexion solaire | Plusieurs | IP67 |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/insert.png" width="80"/> | **Inserts laiton M3** | Fixation boîtier 3D | 6 | À insérer à chaud |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%205%20pin.png" width="80"/> | **Connecteurs étanches 5 pins** | Connexion balance | 2 | IP67 |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/SP1310-SP1312%202%20pin.png" width="80"/> | **Connecteurs étanches 2 pins** | Connexion solaire | 1 | IP67 |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/insert.png" width="80"/> | **Inserts laiton ** | Fixation boîtier 3D | 6 | M3 (diam 4.2mm, hauteur 5mm), à insérer à chaud |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/o-lube.png" width="80"/> | **Graisse silicone** | Lubrification joints | - | Améliore l’étanchéité |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vis%20TTGO.png" width="80"/> | **Vis de fixation TTGO** | Fixation carte | 4 | Inox |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vis%20TTGO.png" width="80"/> | **Vis de fixation TTGO** | Fixation carte | 4 | M2 5mm Inox |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/ipx.png" width="80"/> | **Câble IPX → SMA-K (5 cm)** | Liaison antenne | 1 | Pour module SIM7080G |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Antenna.png" width="80"/> | **Antenne NB-IoT / 4G** | Transmission réseau | 1 | SMA externe |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/cable.png" width="80"/> | **Câble 2 brins (2 m)** | Connexion solaire | 1 | Étanche |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/cable.png" width="80"/> | **Câble 2 brins (2 m)** | Connexion solaire | 1 |  |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/aimants.png" width="80"/> | **Aimants 12×3 mm** | Fixation panneau solaire | 2 | Néodyme |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/PG7.png" width="80"/> | **Presse-étoupe PG7 (12 mm)** | Passage câble | 1 | IP68 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/18650.png" width="80"/> | **Batterie Li-Ion 18650 (3000 mAh)** | Alimentation interne | 1 |  |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/gaine%20thermo.png" width="80"/> | **Gaine thermorétractable** | Protection connexions | - | Étanchéité |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/gaine%20thermo.png" width="80"/> | **Gaine thermorétractable** | Protection connexions | - |  |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/fil%2026%20awg.png" width="80"/> | **Fils AWG26** | Câblage interne | - | LED, boutons |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/sim.png" width="80"/> | **Carte SIM NB-IoT** | Accès réseau | 1 | M2M ou prépayée |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/boîtier%20TTGO.png" width="80"/> | **Boîtier imprimé 3D (PETG)** | Conteneur principal | 1 | Étanche et modulaire |
@@ -102,13 +102,13 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | Image | Composant | Description | Qté | Remarques |
 |:--:|---|---|:--:|---|
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Na4%20Mavin.png" width="80"/> | **Capteurs de charge NA4 Mavin** | Mesure du poids | 2 | 100 ou 200 kg |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x60.png" width="80"/> | **Profilé alu 30×60 Type B** | Structure principale | 2 | 480 mm |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x30.png" width="80"/> | **Profilé alu 30×30 Type B** | Structure secondaire | 4 | 430 mm |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x60.png" width="80"/> | **Profilé alu 30×60 Type B** | Structure  | 2 | 480 mm (format plancher Nicot) |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/profilé%2030x30.png" width="80"/> | **Profilé alu 30×30 Type B** | Structure  | 4 | 430 mm (format plancher Nicot) |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/equerre%20interne.png" width="80"/> | **Équerres internes** | Assemblage mécanique | 8 | Rainure 8 M6 |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/tasseau%20lourd.png" width="80"/> | **Tasseaux lourds B-Type M5** | Fixation structurelle | 2 | Maintien |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/D912.png" width="80"/> | **Visserie DIN 912** | M8x16 / M8x45 / M5x8 | - | Inox |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/drill.png" width="80"/> | **Foret étagé M8 (9–14 mm)** | Perçage profilés | 1 | |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/taraud.png" width="80"/> | **Taraud M8** | Filetage profilés | 1 | Montage précis |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/taraud.png" width="80"/> | **Taraud M8** | Filetage profilés | 1 |  |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/vis%20boitier.png" width="80"/> | **Vis de boîtier** | Fixation boîtier | 4 | Inox |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/3dkit.png" width="80"/> | **Kit impression 3D (PETG)** | Pièces structurelles | 1 | Supports, entretoises |
 
@@ -132,7 +132,7 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | Élément | Coût |
 |---|---:|
 | Connecteurs SP13 2 pins | 11 € |
-| Connecteurs SP13 2 pins | 28 € |
+| Connecteurs SP13 5 pins | 28 € |
 | Peson 200 kg | 250 € |
 | **Sous-total Balances** | **754 €** |
 
