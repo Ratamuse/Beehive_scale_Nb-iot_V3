@@ -1,6 +1,105 @@
 /*
-  Balance_Nb_Iot_web_v4_TTGO_SIM7080G_mqtt_gps_V1.0.10_FINAL.ino
-  
+  Balance_Nb_Iot_web_v4_TTGO_SIM7080G_mqtt_gps_V1.1.1.ino
+
+  CORRECTIONS (2026-04-20) — v1.1.1 :
+  ✅ Commande MQTT set_config : change serveur et/ou port MQTT à distance
+     → Payload : {"action":"set_config","port":1886,"server":"nouveau.domaine.fr"}
+     → Les deux champs sont optionnels (l'un ou l'autre suffit)
+     → Sauvegarde en NVS, efface le retained /cmd, ACK, puis redémarrage
+     → Disponible via le bouton ⚙️ Config MQTT du FOTA UI
+  ✅ Ajout ICCID (numéro de carte SIM) dans le message JSON diagnostics
+     → Lecture manuelle AT+CCID (getSimCCID() retournait "OK" sur SIM7080G)
+     → Stocké dans la variable globale simICCID (String)
+     → Publié dans le topic diagnostics : {"firmware":...,"iccid":"89330..."}
+     → Permet d'identifier la carte SIM associée à chaque balance à distance
+
+  CORRECTIONS (2026-04-13) — v1.1.0 :
+  ✅ Pages "Calibration Réussie" (balance 1 et balance 2) :
+     → Boutons "Tester la balance" et "Retour au menu" enveloppés dans un div flex
+     → display:flex + gap:12px + flex-wrap:wrap + justify-content:center
+     → Affichage correct sur smartphone (plus de débordement/chevauchement)
+
+  CORRECTIONS (2026-03-10) :
+  ✅ PMU DC3 réactivé : PMU.setDC3Voltage(3000) + PMU.enableDC3() dans
+     setupNormalInit(), setupAPModeInit() et stabilizePower()
+     → Alimentation SIM7080G restaurée (modem ne répondait plus à AT)
+  ✅ Ack FOTA/Reset non-retained : retained=false sur topic /cmd/ack
+     → Le message d'accusé de réception ne persiste plus sur le broker
+  ✅ Témoin visuel FOTA (fota.cpp) : clignotement LED pendant le download
+     → 1 flash court (150ms) + 1 flash long (400ms) par seconde
+     → LED éteinte à la fin (succès ou échec)
+
+  AJOUT RESET + FOTA (2026-03-07) — backport depuis v1.0.16 :
+  ✅ Reset à distance via MQTT : {"action":"reset"} sur topic /cmd
+     → Remet à zéro crash_count + fota_retry en NVS (pas de redémarrage)
+  ✅ Nouveaux fichiers : fota.h, fota.cpp (copiés depuis v1.0.16)
+     → Téléchargement firmware via TCP mux0 (TinyGsmClient)
+     → Plus de conflit de mux : mqtt.disconnect() + client.stop() avant fotaExecute
+     → Vérification MD5 + taille avant reboot
+     → Compteur de tentatives NVS (max 10)
+  ✅ mqttCallback() : parse la commande JSON {"action":"ota","url":"...","md5":"...","size":...}
+  ✅ safeMQTTConnect() : setBufferSize(512) + setCallback(mqttCallback)
+  ✅ Topic commande : deviceId + "/cmd"  (ex: E0D16CE6FC84/cmd)
+  ✅ Topic ack : deviceId + "/cmd/ack"
+  ✅ Bloc FOTA dans mainLoop() : subscribe 3s → execute → ack → restart si succès
+  ✅ Commande reset : {"action":"reset"} → remet à zéro crash_count + fota_retry en NVS
+     → Pas de redémarrage, le cycle continue normalement après le reset
+  ✅ Stack appTask : 10000 → 20000 octets
+  ✅ Page web /fota : monitoring état FOTA + reset compteur NVS + lien menu principal
+
+  CORRECTION (2026-03-05):
+  ✅ Calibration en 2 étapes avec tare automatique :
+     → Étape 1 : balance vide → tare automatique (raw_zero mesuré et transmis)
+     → Étape 2 : poser le poids connu → calcul du facteur avec le raw_zero de l'étape 1
+     → Le raw_zero est également stocké comme offset (plus besoin de faire la tare séparément)
+     → Suppression de la dépendance à l'offset précédemment stocké lors de la calibration
+  ✅ Migration vers méthodes natives bibliothèque HX711 (Rob Tillaart v0.6.3) :
+     → Calibration : tare(20) + calibrate_scale(poids, 20) → plus précis (20 lectures vs 10)
+     → Calibration réduite de 3 pages à 2 pages (tare automatique sur chargement)
+     → Tare manuelle : tare(10) au lieu de read_average(10) manuel
+     → Mesure : get_units(10) au lieu de (raw - offset) / factor manuel
+     → Initialisation : set_offset() ajouté après set_scale() au démarrage
+
+  CHANGEMENTS v1.0.13:
+  ✅ Configuration réseau NB-IoT/LTE-M explicite dans safeModemStart()
+     → AT+CFUN=0 (mode avion) avant configuration
+     → AT+CMNB=2 (NB-IoT uniquement, forfait Bouygues NB-IoT)
+     → AT+CBANDCFG="NB-IOT",20 (bande B20 800MHz Bouygues)
+     → AT+CGDCONT=1,"IP","" (APN vide, attribué auto par réseau: ido.net)
+     → AT+CEREG=2 (infos étendues: TAC, Cell ID, AcT)
+     → AT+CFUN=1 puis AT+COPS=0 (réactivation radio + opérateur auto)
+  ✅ safeNetworkConnect() : surveillance CEREG directe (NB-IoT/LTE-M)
+     → Parse manuelle de +CEREG pour détecter stat=1 (home) ou stat=5 (roaming)
+     → Fallback TinyGSM getRegistrationStatus() en parallèle
+     → Polling toutes les 5s avec messages de debug
+  ✅ AT+CNETLIGHT=0 : désactivation LED modem
+  ✅ AT+CMEE=2 : erreurs AT verbose pour diagnostic
+  ✅ Gestion PDP auto-activé : détecte si +APP PDP: 0,ACTIVE après l'attach
+     → Vérifie isGprsConnected() avant de tenter CNACT=0,1
+     → Vide le buffer URC avant les commandes CNACT
+     → Reset CNACT=0,0 avant retry si état incohérent
+
+  CHANGEMENTS v1.0.12:
+  ✅ Authentification MQTT : credentials générés automatiquement depuis eFuse MAC
+     → Username : "bal_" + 8 caractères hex du MAC (ex: "bal_A1B2C3D4")
+     → Password : hash déterministe 16 caractères hex basé sur le MAC complet
+     → Reproductible : mêmes credentials à chaque boot pour un même ESP32
+     → Non modifiable : sécurité par design, pas de mot de passe en dur
+  ✅ mqtt_user / mqtt_pass : changés de const char* vides à String générés
+  ✅ safeMQTTConnect() : utilise les credentials générés (au lieu de chaînes vides)
+  ✅ Interface web : affiche les identifiants MQTT (user + password) sur la page d'accueil
+  ✅ Page config MQTT : affiche les credentials en lecture seule avec instructions
+     → Permet de copier facilement user/pass pour configurer le broker MQTT
+
+  CHANGEMENTS v1.0.11:
+  ✅ ID unique station : basé sur eFuse MAC ESP32-S3 (12 caractères hex)
+  ✅ Topics MQTT : format deviceId/deviceName/<>/topic/<>/data/0
+     → deviceId garantit l'unicité (filtrage Telegraf)
+     → deviceName reste modifiable pour la lisibilité
+  ✅ WiFi SSID : "balance" + deviceName (lisible, modifiable)
+  ✅ Interface web : affiche ID station (fixe) + nom station (modifiable)
+  ✅ Évite collisions : plusieurs stations peuvent avoir le même nom
+
   CHANGEMENTS v1.0.10 (Version finale pour déploiement):
   ✅ Watchdog optimisé : suppression tâches surveillance inutiles
   ✅ TWDT timeout 6 min (pour GPS 3 min max)
@@ -14,7 +113,7 @@
   ✅ Validation données capteurs (NaN, Inf, ranges)
   ✅ Diagnostics MQTT améliorés
   ✅ DUMP_AT_COMMANDS conservé (debug essentiel)
-  
+
 */
 
 #include <Arduino.h>
@@ -34,7 +133,7 @@ XPowersPMU PMU;
 // See all AT commands, if wanted
 // ⚠️ DÉSACTIVÉ pour déploiement terrain (pas d'accès Serial)
 // Économie : ~2-3 KB RAM + ~5% CPU
-// #define DUMP_AT_COMMANDS
+//#define DUMP_AT_COMMANDS
 
 #define TINY_GSM_RX_BUFFER 1024
 #define TINY_GSM_MODEM_SIM7080
@@ -60,11 +159,12 @@ PubSubClient mqtt(client);
 #include "HX711.h"
 #include "OneWire.h"
 #include "Update.h"
+#include "fota.h"
 
 // ---------- CONSTANTS ----------
 const char *ssidPrefix = "balance";
 const char *password1 = "123456789";  // ⚠️ CHANGEZ AVANT DÉPLOIEMENT
-const char *FIRMWARE_VERSION = "1.0.10";
+const char *FIRMWARE_VERSION = "1.1.1";
 WebServer server(80);
 Preferences preferences;
 
@@ -78,7 +178,7 @@ const uint8_t clockPin1 = 11;
 const uint8_t dataPin2 = 14;
 const uint8_t clockPin2 = 13;
 
-const int ledPin = 1;
+extern const int ledPin = 1;
 const int wifiPin = 47;
 const int heartbeatPin = 10;
 
@@ -86,12 +186,25 @@ const int heartbeatPin = 10;
 TaskHandle_t appTaskHandle = NULL;
 
 // MQTT / prefs
-const char *mqtt_user = "";
-const char *mqtt_pass = "";
+String mqtt_user = "";  // Généré à partir du MAC eFuse
+String mqtt_pass = "";  // Généré à partir du MAC eFuse
+String simICCID  = "";  // Numéro de carte SIM (lu après init modem)
 String mqtt_client_id = "";
+String deviceId = "";  // ID unique basé sur l'eFuse MAC de l'ESP32
 String mqtt_topic_temp1, mqtt_topic_scaleA, mqtt_topic_scaleB;
 String mqtt_topic_battery, mqtt_topic_signal, mqtt_topic_position, mqtt_topic_position_approx;
 String mqtt_topic_diagnostics;
+String mqtt_topic_cmd;   // Commandes FOTA : deviceId/cmd
+
+// FOTA / CMD — état en attente (rempli par mqttCallback)
+bool     fotaPending       = false;
+bool     resetPending      = false;
+bool     configPending     = false;   // set_config : port et/ou serveur
+int      pendingMqttPort   = 0;       // 0 = inchangé
+String   pendingMqttServer = "";      // "" = inchangé
+String   fotaUrl          = "";
+String   fotaMd5          = "";
+uint32_t fotaExpectedSize = 0;
 
 // globals & telemetry
 int batteryPercent = 0;
@@ -147,6 +260,42 @@ const int MAX_VALID_WEIGHT = 200000;
 const float MAX_VALID_FACTOR = 1000000.0f;
 
 // ---------- Utility ----------
+
+// Génère l'ID unique du device basé sur l'eFuse MAC de l'ESP32-S3
+// Format: 12 caractères hexadécimaux (ex: "A1B2C3D4E5F6")
+String getDeviceId() {
+  uint64_t chipid = ESP.getEfuseMac();
+  char id[13];
+  snprintf(id, sizeof(id), "%04X%08X",
+           (uint16_t)(chipid >> 32),
+           (uint32_t)chipid);
+  return String(id);
+}
+
+// Génère les credentials MQTT uniques basés sur l'eFuse MAC de l'ESP32
+// Ces credentials sont déterministes et reproductibles pour un même ESP32
+// Format username: bal_XXXXXXXX (12 chars max pour compatibilité MQTT)
+// Format password: hash hexadécimal de 16 caractères
+void generateMQTTCredentials(String &username, String &password) {
+  uint64_t chipid = ESP.getEfuseMac();
+
+  // Utiliser les 12 caractères de l'eFuse MAC (au lieu de 8)
+  char user[17];
+  snprintf(user, sizeof(user), "bal_%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
+  username = String(user);
+
+  // Génération du mot de passe (inchangée)
+  uint32_t hash1 = (uint32_t)(chipid ^ (chipid >> 32));
+  uint32_t hash2 = ((hash1 << 13) | (hash1 >> 19)) ^ 0xDEADBEEF;
+  uint32_t hash3 = ((hash2 << 7) | (hash2 >> 25)) ^ (uint32_t)(chipid >> 16);
+  uint32_t hash4 = hash1 ^ hash2 ^ hash3 ^ 0xCAFEBABE;
+
+  char pass[17];
+  snprintf(pass, sizeof(pass), "%08X%08X", hash3, hash4);
+  password = String(pass);
+}
+
+
 float randomFloat(float minVal, float maxVal) {
   return minVal + (float)esp_random() / (float)UINT32_MAX * (maxVal - minVal);
 }
@@ -466,6 +615,8 @@ bool safeModemStart() {
   for (int attempt = 1; attempt <= MODEM_MAX_RETRIES; ++attempt) {
     stabilizePower();
     Serial1.begin(115200, SERIAL_8N1, BOARD_MODEM_RXD_PIN, BOARD_MODEM_TXD_PIN);
+
+    // Séquence PWRKEY: LOW 150ms -> HIGH 1000ms -> LOW 500ms
     pinMode(BOARD_MODEM_PWR_PIN, OUTPUT);
     digitalWrite(BOARD_MODEM_PWR_PIN, LOW);
     vTaskDelay(150 / portTICK_PERIOD_MS);
@@ -480,6 +631,47 @@ bool safeModemStart() {
     while (millis() - start < 20000UL) {
       if (modem.testAT(2000)) {
         Serial.println("Modem ready (AT OK)");
+
+        // --- Configuration réseau NB-IoT / LTE-M ---
+        // Désactiver LED modem
+        modem.sendAT("+CNETLIGHT=0");
+        modem.waitResponse(5000);
+
+        // Mode avion pour configurer proprement
+        modem.sendAT("+CFUN=0");
+        modem.waitResponse(10000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        // Mode réseau: 1=CAT-M, 2=NB-IoT, 3=CAT-M+NB-IoT
+        modem.sendAT("+CMNB=2");
+        modem.waitResponse(5000);
+
+        // Bande NB-IoT: B20 (800MHz Bouygues France)
+        modem.sendAT("+CBANDCFG=\"NB-IOT\",20");
+        modem.waitResponse(5000);
+
+        // APN vide — le réseau attribue automatiquement (ido.net pour Bouygues)
+        modem.sendAT("+CGDCONT=1,\"IP\",\"\"");
+        modem.waitResponse(5000);
+
+        // Activer infos étendues CEREG (TAC, Cell ID, AcT)
+        modem.sendAT("+CEREG=2");
+        modem.waitResponse(5000);
+
+        // Erreurs verbose
+        modem.sendAT("+CMEE=2");
+        modem.waitResponse(5000);
+
+        // Réactiver la radio
+        modem.sendAT("+CFUN=1");
+        modem.waitResponse(10000);
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+
+        // Sélection opérateur automatique
+        modem.sendAT("+COPS=0");
+        modem.waitResponse(10000);
+
+        Serial.println("Modem configured (NB-IoT B20 uniquement)");
         return true;
       }
       vTaskDelay(500 / portTICK_PERIOD_MS);
@@ -497,40 +689,192 @@ bool safeNetworkConnect() {
     emergencySleep();
     return false;
   }
+  // Lecture ICCID (numéro de carte SIM) — lecture manuelle car getSimCCID()
+  // retourne "OK" au lieu de la valeur sur SIM7080G
+  modem.sendAT("+CCID");
+  simICCID = "";
+  unsigned long _iccidStart = millis();
+  while (millis() - _iccidStart < 3000) {
+    if (modem.stream.available()) {
+      String _line = modem.stream.readStringUntil('\n');
+      _line.trim();
+      // L'ICCID commence toujours par 89 et fait 19-20 chiffres
+      if (_line.length() >= 18 && _line.startsWith("89")) {
+        simICCID = _line;
+        break;
+      }
+      // Certains modems préfixent avec "+CCID: "
+      if (_line.startsWith("+CCID:")) {
+        simICCID = _line.substring(6);
+        simICCID.trim();
+        break;
+      }
+    }
+    vTaskDelay(10 / portTICK_PERIOD_MS);
+  }
+  Serial.println("SIM ICCID: " + (simICCID.length() ? simICCID : "non trouvé"));
 
+  // Attente enregistrement réseau via CEREG (NB-IoT/LTE-M)
+  // CEREG stat: 0=non enregistré, 1=home, 2=recherche, 3=refusé, 5=roaming
+  bool registered = false;
   unsigned long start = millis();
+
+  Serial.println("Attente enregistrement réseau...");
   while (millis() - start < NETWORK_TIMEOUT) {
     esp_task_wdt_reset();
 
+    // Interroger CEREG manuellement pour NB-IoT/LTE-M
+    modem.sendAT("+CEREG?");
+    String response = "";
+    unsigned long cmdStart = millis();
+    while (millis() - cmdStart < 3000) {
+      if (modem.stream.available()) {
+        char c = modem.stream.read();
+        response += c;
+      }
+      if (response.indexOf("OK") >= 0 || response.indexOf("ERROR") >= 0) break;
+      vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+
+    // Parser le statut CEREG
+    int idx = response.indexOf("+CEREG:");
+    if (idx >= 0) {
+      int commaIdx = response.indexOf(',', idx);
+      if (commaIdx >= 0) {
+        char statChar = response.charAt(commaIdx + 1);
+        int stat = statChar - '0';
+
+        if (stat == 1 || stat == 5) {
+          registered = true;
+          Serial.println("Réseau enregistré (CEREG=" + String(stat) + ")");
+          break;
+        } else if (stat == 3) {
+          Serial.println("Réseau refusé (CEREG=3)");
+        }
+      }
+    }
+
+    // Fallback: vérifier aussi via TinyGSM
     int reg = modem.getRegistrationStatus();
     if (reg == REG_OK_HOME || reg == REG_OK_ROAMING) {
+      registered = true;
+      Serial.println("Réseau enregistré (TinyGSM reg=" + String(reg) + ")");
       break;
     }
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
   }
 
+  if (!registered) {
+    Serial.println("Echec enregistrement réseau (timeout)");
+    return false;
+  }
+
+  // Vider le buffer série (URC en attente comme +APP PDP, +CEREG, etc.)
+  vTaskDelay(500 / portTICK_PERIOD_MS);
+  while (modem.stream.available()) modem.stream.read();
+
+  // Vérifier si le PDP est déjà actif (auto-activation à l'attach)
+  modem.sendAT("+CNACT?");
+  if (modem.waitResponse(5000) == 1) {
+    // Vider à nouveau pour être propre
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+    while (modem.stream.available()) modem.stream.read();
+  }
+
+  if (modem.isGprsConnected()) {
+    Serial.println("Data déjà actif (PDP auto-activé à l'attach)");
+    return true;
+  }
+
+  // Sinon, activer manuellement la connexion data (PDP context)
   for (int i = 0; i < 3; i++) {
     esp_task_wdt_reset();
-    
+
+    // D'abord désactiver si dans un état incohérent
+    modem.sendAT("+CNACT=0,0");
+    modem.waitResponse(5000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
     modem.sendAT("+CNACT=0,1");
-    if (modem.waitResponse(15000) == 1 && modem.isGprsConnected()) {
-      return true;
+    if (modem.waitResponse(15000) == 1) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      if (modem.isGprsConnected()) {
+        Serial.println("Data connecté (CNACT OK)");
+        return true;
+      }
     }
+    Serial.printf("CNACT tentative %d échouée, retry...\n", i + 1);
     vTaskDelay(5000 / portTICK_PERIOD_MS);
   }
   return false;
 }
 
+// -----------------------------------------------------------------------
+// Callback MQTT — reçoit les commandes FOTA
+// -----------------------------------------------------------------------
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.printf("[MQTT] Message recu sur %s (%u bytes)\n", topic, length);
+  if (length > 500 || length == 0) return;
+
+  // Vérifier que c'est bien le topic de commande
+  if (String(topic) != mqtt_topic_cmd) return;
+
+  // Parser le JSON
+  StaticJsonDocument<512> doc;
+  DeserializationError err = deserializeJson(doc, payload, length);
+  if (err) {
+    Serial.printf("[MQTT] JSON invalide: %s\n", err.c_str());
+    return;
+  }
+
+  const char* action = doc["action"] | "";
+  if (strcmp(action, "ota") == 0) {
+    fotaUrl          = String(doc["url"]  | "");
+    fotaMd5          = String(doc["md5"]  | "");
+    fotaExpectedSize = (uint32_t)(doc["size"] | 0);
+    if (fotaUrl.length() == 0) {
+      Serial.println("[MQTT] URL FOTA manquante");
+      return;
+    }
+    fotaPending = true;
+    Serial.printf("[FOTA] Commande OTA recue: url=%s md5=%s size=%u\n",
+                  fotaUrl.c_str(), fotaMd5.c_str(), fotaExpectedSize);
+  } else if (strcmp(action, "reset") == 0) {
+    Serial.println("[MQTT] Commande RESET recue");
+    resetPending = true;
+  } else if (strcmp(action, "set_config") == 0) {
+    int         p   = doc["port"]   | 0;
+    const char* srv = doc["server"] | "";
+    pendingMqttPort   = (p >= 1 && p <= 65535) ? p : 0;
+    pendingMqttServer = String(srv);
+    if (pendingMqttPort > 0 || pendingMqttServer.length() > 0) {
+      configPending = true;
+      Serial.printf("[CMD] set_config demande — port:%d serveur:\"%s\"\n",
+                    pendingMqttPort, pendingMqttServer.c_str());
+    } else {
+      Serial.println("[CMD] set_config: aucun champ valide, ignore");
+    }
+  } else {
+    Serial.printf("[MQTT] Action inconnue: %s\n", action);
+  }
+}
+
 bool safeMQTTConnect() {
+  mqtt.setBufferSize(512);  // nécessaire pour les payloads FOTA (~200 octets)
   mqtt.setServer(cfg.mqtt_server.c_str(), cfg.mqtt_port);
+  mqtt.setCallback(mqttCallback);
 
   unsigned long start = millis();
   while (millis() - start < MQTT_CONNECT_TIMEOUT) {
     esp_task_wdt_reset();
 
-    if (mqtt.connect(mqtt_client_id.c_str(), mqtt_user, mqtt_pass)) {
+    // Utiliser les credentials générés à partir du MAC eFuse
+    if (mqtt.connect(mqtt_client_id.c_str(), mqtt_user.c_str(), mqtt_pass.c_str())) {
+      Serial.println("MQTT connected with credentials: " + mqtt_user);
       return true;
     }
+    Serial.println("MQTT connection failed, retrying...");
     vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
   return false;
@@ -677,7 +1021,7 @@ void sendCommonHTML(String &body) {
 void handleRoot() {
   // Lire la batterie et la température maintenant
   batteryPercent = PMU.getBatteryPercent();
-  
+
   // Lire température DS18B20
   int currentTemp = -999;
   sensor.requestTemperatures();
@@ -685,7 +1029,7 @@ void handleRoot() {
   if (sensor.isConversionComplete()) {
     currentTemp = (int)round(sensor.getTempC());
   }
-  
+
   String message = "<div class='header'>";
   message += "<h1>" + cfg.deviceName + "</h1>";
   message += "<div class='version'>Firmware v" + String(FIRMWARE_VERSION) + "</div>";
@@ -729,8 +1073,16 @@ void handleRoot() {
   // Configuration
   message += "<h2>Configuration</h2>";
   message += "<div class='info-grid'>";
+  message += "<div class='info-card'><strong>🔑 ID Station</strong>" + deviceId + "</div>";
   message += "<div class='info-card'><strong>📝 Nom</strong>" + cfg.deviceName + "</div>";
   message += "<div class='info-card'><strong>📡 MQTT</strong>" + cfg.mqtt_server + ":" + String(cfg.mqtt_port) + "</div>";
+  message += "</div>";
+
+  // Credentials MQTT (lecture seule)
+  message += "<h2>🔐 Identifiants MQTT</h2>";
+  message += "<div class='info-grid'>";
+  message += "<div class='info-card'><strong>👤 Utilisateur</strong><code>" + mqtt_user + "</code></div>";
+  message += "<div class='info-card'><strong>🔑 Mot de passe</strong><code style='word-break:break-all;'>" + mqtt_pass + "</code></div>";
   message += "</div>";
   
   // Menu principal
@@ -740,14 +1092,15 @@ void handleRoot() {
   message += "<a href='/weight2' class='link-card link-balance2'>Balance 2<br>Peser</a>";
   message += "<a href='/calibrate1' class='link-card link-calib1'>Calibrer<br>Balance 1</a>";
   message += "<a href='/calibrate2' class='link-card link-calib2'>Calibrer<br>Balance 2</a>";
-  message += "<a href='/setDeviceName' class='link-card link-device'>Nom du<br>Device</a>";
+  message += "<a href='/setDeviceName' class='link-card link-device'>Nom de<br>Station</a>";
   message += "<a href='/setMQTT' class='link-card link-mqtt'>Config<br>MQTT</a>";
   message += "<a href='/update' class='link-card link-ota'>Mise à jour<br>Firmware</a>";
+  message += "<a href='/fota' class='link-card link-ota'>FOTA<br>NB-IoT</a>";
   message += "</div>";
   
   // Reboot
   message += "<form action='/reboot' method='post' style='text-align:center;'>";
-  message += "<input type='submit' value='🔄 Redémarrer le Device' class='btn btn-danger'>";
+  message += "<input type='submit' value='🔄 Redémarrer la Station' class='btn btn-danger'>";
   message += "</form>";
   
   message += "</div>";
@@ -755,9 +1108,98 @@ void handleRoot() {
 }
 
 void handleCalibration1() {
+  // --- Étape 2 : poids connu posé → calibration via bibliothèque ---
   if (server.hasArg("known")) {
     float knownWeight = server.arg("known").toFloat();
-    
+
+    if (knownWeight <= 0.0f) {
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ Poids invalide.";
+      msg += "</div><br><a href='/calibrate1' class='btn'>Recommencer</a> ";
+      msg += "<a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    if (!scale1.is_ready()) {
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ Balance 1 non prête. Vérifiez les connexions.";
+      msg += "</div><br><a href='/calibrate1' class='btn'>Recommencer</a> ";
+      msg += "<a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    scale1.calibrate_scale(knownWeight, 20);
+    float newFactor = scale1.get_scale();
+    int32_t newOffset = scale1.get_offset();
+
+    if (!isValidFactor(newFactor)) {
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ Facteur de calibration invalide calculé.";
+      msg += "</div><br><a href='/calibrate1' class='btn'>Recommencer</a> ";
+      msg += "<a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    if (!safePreferencesBegin(false)) {
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ Erreur d'écriture des préférences.";
+      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    preferences.putFloat("factor1", newFactor);
+    preferences.putFloat("offset1", (float)newOffset);
+    safePreferencesEnd();
+
+    if (!safePreferencesBegin(true)) {
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ Erreur de vérification.";
+      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    float readback = preferences.getFloat("factor1", 0.0f);
+    safePreferencesEnd();
+
+    if (abs(readback - newFactor) > 0.0001f) {
+      Serial.printf("ERROR: Calibration A write verify failed! Wrote %.6f, read %.6f\n",
+                    newFactor, readback);
+      String msg = "<div class='header'><h1>Erreur</h1></div>";
+      msg += "<div class='content'><div class='alert alert-danger'>";
+      msg += "⚠️ La vérification d'écriture a échoué.";
+      msg += "</div><br><a href='/calibrate1' class='btn'>Recommencer</a> ";
+      msg += "<a href='/' class='btn'>Retour</a></div>";
+      sendCommonHTML(msg);
+      return;
+    }
+
+    cfg.factor1 = newFactor;
+    cfg.offset1 = (float)newOffset;
+
+    String msg = "<div class='header'><h1>✅ Calibration Réussie</h1></div>";
+    msg += "<div class='content'>";
+    msg += "<div class='alert'>🎉 Balance 1 calibrée avec succès !</div>";
+    msg += "<div class='info-card'><strong>Facteur de calibration</strong>" + String(newFactor, 6) + "</div>";
+    msg += "<div class='info-card'><strong>Offset (zéro)</strong>" + String(newOffset) + "</div>";
+    msg += "<div style='display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;'>";
+    msg += "<a href='/weight1' class='btn'>Tester la balance</a>";
+    msg += "<a href='/' class='btn'>Retour au menu</a>";
+    msg += "</div>";
+    msg += "</div>";
+    sendCommonHTML(msg);
+  }
+  // --- Page initiale : tare automatique sur chargement + saisie du poids ---
+  else {
     if (!scale1.is_ready()) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -767,43 +1209,62 @@ void handleCalibration1() {
       sendCommonHTML(msg);
       return;
     }
-    
-    float raw = scale1.read_average(10);
-    
-    if (!isValidFloat(raw) || raw == 0.0f) {
+
+    scale1.tare(20);
+
+    String form = "<div class='header'><h1>Calibration Balance 1</h1></div>";
+    form += "<div class='content'>";
+    form += "<div class='alert'>✅ Tare effectuée. Posez maintenant le poids connu sur la balance 1.</div>";
+    form += "<form action='/calibrate1' method='get'>";
+    form += "<label><strong>Poids connu (grammes) :</strong></label>";
+    form += "<input type='number' step='0.01' name='known' required>";
+    form += "<br><br><input type='submit' value='🔧 Calibrer'>";
+    form += "</form>";
+    form += "<br><a href='/calibrate1' class='btn'>Recommencer</a> <a href='/' class='btn'>Retour</a>";
+    form += "</div>";
+    sendCommonHTML(form);
+  }
+}
+
+void handleCalibration2() {
+  // --- Étape 2 : poids connu posé → calibration via bibliothèque ---
+  if (server.hasArg("known")) {
+    float knownWeight = server.arg("known").toFloat();
+
+    if (knownWeight <= 0.0f) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Valeur invalide de la balance. Réessayez.";
-      msg += "</div><br><a href='/calibrate1' class='btn'>Réessayer</a> ";
+      msg += "⚠️ Poids invalide.";
+      msg += "</div><br><a href='/calibrate2' class='btn'>Recommencer</a> ";
       msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
-    if (!safePreferencesBegin(true)) {
+
+    if (!scale2.is_ready()) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur d'accès aux préférences.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
+      msg += "⚠️ Balance 2 non prête. Vérifiez les connexions.";
+      msg += "</div><br><a href='/calibrate2' class='btn'>Recommencer</a> ";
+      msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
-    float oldOffset = preferences.getFloat("offset1", 0.0);
-    safePreferencesEnd();
-    
-    float newFactor = (raw - oldOffset) / knownWeight;
-    
+
+    scale2.calibrate_scale(knownWeight, 20);
+    float newFactor = scale2.get_scale();
+    int32_t newOffset = scale2.get_offset();
+
     if (!isValidFactor(newFactor)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
       msg += "⚠️ Facteur de calibration invalide calculé.";
-      msg += "</div><br><a href='/calibrate1' class='btn'>Réessayer</a> ";
+      msg += "</div><br><a href='/calibrate2' class='btn'>Recommencer</a> ";
       msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
+
     if (!safePreferencesBegin(false)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -812,10 +1273,11 @@ void handleCalibration1() {
       sendCommonHTML(msg);
       return;
     }
-    
-    preferences.putFloat("factor1", newFactor);
+
+    preferences.putFloat("factor2", newFactor);
+    preferences.putFloat("offset2", (float)newOffset);
     safePreferencesEnd();
-    
+
     if (!safePreferencesBegin(true)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -824,52 +1286,39 @@ void handleCalibration1() {
       sendCommonHTML(msg);
       return;
     }
-    
-    float readback = preferences.getFloat("factor1", 0.0f);
+
+    float readback = preferences.getFloat("factor2", 0.0f);
     safePreferencesEnd();
-    
+
     if (abs(readback - newFactor) > 0.0001f) {
-      Serial.printf("ERROR: Calibration write verify failed! Wrote %.6f, read %.6f\n", 
+      Serial.printf("ERROR: Calibration B write verify failed! Wrote %.6f, read %.6f\n",
                     newFactor, readback);
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
       msg += "⚠️ La vérification d'écriture a échoué.";
-      msg += "</div><br><a href='/calibrate1' class='btn'>Réessayer</a> ";
+      msg += "</div><br><a href='/calibrate2' class='btn'>Recommencer</a> ";
       msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
-    cfg.factor1 = newFactor;
-    scale1.set_scale(newFactor);
-    
+
+    cfg.factor2 = newFactor;
+    cfg.offset2 = (float)newOffset;
+
     String msg = "<div class='header'><h1>✅ Calibration Réussie</h1></div>";
     msg += "<div class='content'>";
-    msg += "<div class='alert'>🎉 Balance 1 calibrée avec succès !</div>";
+    msg += "<div class='alert'>🎉 Balance 2 calibrée avec succès !</div>";
     msg += "<div class='info-card'><strong>Facteur de calibration</strong>" + String(newFactor, 6) + "</div>";
-    msg += "<br><a href='/weight1' class='btn'>Tester la balance</a> ";
+    msg += "<div class='info-card'><strong>Offset (zéro)</strong>" + String(newOffset) + "</div>";
+    msg += "<div style='display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;'>";
+    msg += "<a href='/weight2' class='btn'>Tester la balance</a>";
     msg += "<a href='/' class='btn'>Retour au menu</a>";
     msg += "</div>";
+    msg += "</div>";
     sendCommonHTML(msg);
-  } else {
-    String form = "<div class='header'><h1>Calibration Balance 1</h1></div>";
-    form += "<div class='content'>";
-    form += "<div class='alert'>📏 Placez un poids connu sur la balance et entrez sa valeur en grammes.</div>";
-    form += "<form action='/calibrate1' method='get'>";
-    form += "<label><strong>Poids connu (grammes) :</strong></label>";
-    form += "<input type='number' step='0.01' name='known' required>";
-    form += "<br><br><input type='submit' value='🔧 Calibrer'>";
-    form += "</form>";
-    form += "<br><a href='/' class='btn'>Retour</a>";
-    form += "</div>";
-    sendCommonHTML(form);
   }
-}
-
-void handleCalibration2() {
-  if (server.hasArg("known")) {
-    float knownWeight = server.arg("known").toFloat();
-    
+  // --- Page initiale : tare automatique sur chargement + saisie du poids ---
+  else {
     if (!scale2.is_ready()) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -879,100 +1328,18 @@ void handleCalibration2() {
       sendCommonHTML(msg);
       return;
     }
-    
-    float raw = scale2.read_average(10);
-    
-    if (!isValidFloat(raw) || raw == 0.0f) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Valeur invalide de la balance. Réessayez.";
-      msg += "</div><br><a href='/calibrate2' class='btn'>Réessayer</a> ";
-      msg += "<a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    if (!safePreferencesBegin(true)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur d'accès aux préférences.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    float oldOffset = preferences.getFloat("offset2", 0.0);
-    safePreferencesEnd();
-    
-    float newFactor = (raw - oldOffset) / knownWeight;
-    
-    if (!isValidFactor(newFactor)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Facteur de calibration invalide calculé.";
-      msg += "</div><br><a href='/calibrate2' class='btn'>Réessayer</a> ";
-      msg += "<a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    if (!safePreferencesBegin(false)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur d'écriture des préférences.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    preferences.putFloat("factor2", newFactor);
-    safePreferencesEnd();
-    
-    if (!safePreferencesBegin(true)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur de vérification.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    float readback = preferences.getFloat("factor2", 0.0f);
-    safePreferencesEnd();
-    
-    if (abs(readback - newFactor) > 0.0001f) {
-      Serial.printf("ERROR: Calibration write verify failed! Wrote %.6f, read %.6f\n", 
-                    newFactor, readback);
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ La vérification d'écriture a échoué.";
-      msg += "</div><br><a href='/calibrate2' class='btn'>Réessayer</a> ";
-      msg += "<a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    cfg.factor2 = newFactor;
-    scale2.set_scale(newFactor);
-    
-    String msg = "<div class='header'><h1>✅ Calibration Réussie</h1></div>";
-    msg += "<div class='content'>";
-    msg += "<div class='alert'>🎉 Balance 2 calibrée avec succès !</div>";
-    msg += "<div class='info-card'><strong>Facteur de calibration</strong>" + String(newFactor, 6) + "</div>";
-    msg += "<br><a href='/weight2' class='btn'>Tester la balance</a> ";
-    msg += "<a href='/' class='btn'>Retour au menu</a>";
-    msg += "</div>";
-    sendCommonHTML(msg);
-  } else {
+
+    scale2.tare(20);
+
     String form = "<div class='header'><h1>Calibration Balance 2</h1></div>";
     form += "<div class='content'>";
-    form += "<div class='alert'>📏 Placez un poids connu sur la balance et entrez sa valeur en grammes.</div>";
+    form += "<div class='alert'>✅ Tare effectuée. Posez maintenant le poids connu sur la balance 2.</div>";
     form += "<form action='/calibrate2' method='get'>";
     form += "<label><strong>Poids connu (grammes) :</strong></label>";
     form += "<input type='number' step='0.01' name='known' required>";
     form += "<br><br><input type='submit' value='🔧 Calibrer'>";
     form += "</form>";
-    form += "<br><a href='/' class='btn'>Retour</a>";
+    form += "<br><a href='/calibrate2' class='btn'>Recommencer</a> <a href='/' class='btn'>Retour</a>";
     form += "</div>";
     sendCommonHTML(form);
   }
@@ -990,36 +1357,28 @@ void handleWeight1() {
       return;
     }
     
-    float rawZero = scale1.read_average(10);
-    
-    if (!isValidFloat(rawZero)) {
+    scale1.tare(10);
+    int32_t newOffset1 = scale1.get_offset();
+
+    if (!safePreferencesBegin(false)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Valeur invalide de la balance.";
+      msg += "⚠️ Erreur sauvegarde NVS.";
       msg += "</div><br><a href='/weight1' class='btn'>Réessayer</a> ";
       msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
-    if (!safePreferencesBegin(false)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur d'accès aux préférences.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    preferences.putFloat("offset1", rawZero);
+
+    preferences.putFloat("offset1", (float)newOffset1);
     safePreferencesEnd();
-    
-    cfg.offset1 = rawZero;
-    
+
+    cfg.offset1 = (float)newOffset1;
+
     String msg = "<div class='header'><h1>✅ Tare Effectuée</h1></div>";
     msg += "<div class='content'>";
     msg += "<div class='alert'>🎯 Balance 1 remise à zéro !</div>";
-    msg += "<div class='info-card'><strong>Offset</strong>" + String(rawZero, 2) + "</div>";
+    msg += "<div class='info-card'><strong>Offset</strong>" + String(newOffset1) + "</div>";
     msg += "<br><a href='/weight1' class='btn'>Peser à nouveau</a> ";
     msg += "<a href='/' class='btn'>Retour au menu</a>";
     msg += "</div>";
@@ -1029,13 +1388,12 @@ void handleWeight1() {
     message += "<div class='content'>";
     
     if (scale1.is_ready()) {
-      float raw = scale1.read_average(10);
+      float w1 = scale1.get_units(10);
       int weight = -1;
-      
-      if (isValidFloat(raw) && cfg.factor1 != 0.0f) {
-        weight = (int)((raw - cfg.offset1) / cfg.factor1);
-      }
-      
+
+      if (isValidFloat(w1))
+        weight = (int)round(w1);
+
       if (isValidWeight(weight)) {
         message += "<div class='weight-display'>";
         message += "<div class='weight-value'>" + String(weight) + " g</div>";
@@ -1044,8 +1402,6 @@ void handleWeight1() {
       } else {
         message += "<div class='alert alert-danger'>⚠️ Poids hors limites ou erreur de lecture</div>";
       }
-      
-      message += "<div class='info-card'><strong>Valeur brute</strong>" + String(raw, 2) + "</div>";
     } else {
       message += "<div class='alert alert-danger'>⚠️ Balance non prête</div>";
     }
@@ -1074,36 +1430,28 @@ void handleWeight2() {
       return;
     }
     
-    float rawZero = scale2.read_average(10);
-    
-    if (!isValidFloat(rawZero)) {
+    scale2.tare(10);
+    int32_t newOffset2 = scale2.get_offset();
+
+    if (!safePreferencesBegin(false)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Valeur invalide de la balance.";
+      msg += "⚠️ Erreur sauvegarde NVS.";
       msg += "</div><br><a href='/weight2' class='btn'>Réessayer</a> ";
       msg += "<a href='/' class='btn'>Retour</a></div>";
       sendCommonHTML(msg);
       return;
     }
-    
-    if (!safePreferencesBegin(false)) {
-      String msg = "<div class='header'><h1>Erreur</h1></div>";
-      msg += "<div class='content'><div class='alert alert-danger'>";
-      msg += "⚠️ Erreur d'accès aux préférences.";
-      msg += "</div><br><a href='/' class='btn'>Retour</a></div>";
-      sendCommonHTML(msg);
-      return;
-    }
-    
-    preferences.putFloat("offset2", rawZero);
+
+    preferences.putFloat("offset2", (float)newOffset2);
     safePreferencesEnd();
-    
-    cfg.offset2 = rawZero;
-    
+
+    cfg.offset2 = (float)newOffset2;
+
     String msg = "<div class='header'><h1>✅ Tare Effectuée</h1></div>";
     msg += "<div class='content'>";
     msg += "<div class='alert'>🎯 Balance 2 remise à zéro !</div>";
-    msg += "<div class='info-card'><strong>Offset</strong>" + String(rawZero, 2) + "</div>";
+    msg += "<div class='info-card'><strong>Offset</strong>" + String(newOffset2) + "</div>";
     msg += "<br><a href='/weight2' class='btn'>Peser à nouveau</a> ";
     msg += "<a href='/' class='btn'>Retour au menu</a>";
     msg += "</div>";
@@ -1113,13 +1461,12 @@ void handleWeight2() {
     message += "<div class='content'>";
     
     if (scale2.is_ready()) {
-      float raw = scale2.read_average(10);
+      float w2 = scale2.get_units(10);
       int weight = -1;
-      
-      if (isValidFloat(raw) && cfg.factor2 != 0.0f) {
-        weight = (int)((raw - cfg.offset2) / cfg.factor2);
-      }
-      
+
+      if (isValidFloat(w2))
+        weight = (int)round(w2);
+
       if (isValidWeight(weight)) {
         message += "<div class='weight-display'>";
         message += "<div class='weight-value'>" + String(weight) + " g</div>";
@@ -1128,8 +1475,6 @@ void handleWeight2() {
       } else {
         message += "<div class='alert alert-danger'>⚠️ Poids hors limites ou erreur de lecture</div>";
       }
-      
-      message += "<div class='info-card'><strong>Valeur brute</strong>" + String(raw, 2) + "</div>";
     } else {
       message += "<div class='alert alert-danger'>⚠️ Balance non prête</div>";
     }
@@ -1149,7 +1494,7 @@ void handleWeight2() {
 void handleSetDeviceName() {
   if (server.hasArg("name")) {
     String newName = server.arg("name");
-    
+
     if (newName.length() == 0 || newName.length() > 32) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -1159,7 +1504,7 @@ void handleSetDeviceName() {
       sendCommonHTML(msg);
       return;
     }
-    
+
     if (!safePreferencesBegin(false)) {
       String msg = "<div class='header'><h1>Erreur</h1></div>";
       msg += "<div class='content'><div class='alert alert-danger'>";
@@ -1168,26 +1513,27 @@ void handleSetDeviceName() {
       sendCommonHTML(msg);
       return;
     }
-    
+
     preferences.putString("deviceName", newName);
     safePreferencesEnd();
-    
+
     cfg.deviceName = newName;
-    
+
     String msg = "<div class='header'><h1>✅ Nom Modifié</h1></div>";
     msg += "<div class='content'>";
-    msg += "<div class='alert'>🎉 Nom du device changé avec succès !</div>";
+    msg += "<div class='alert'>🎉 Nom de la station changé avec succès !</div>";
     msg += "<div class='info-card'><strong>Nouveau nom</strong>" + newName + "</div>";
-    msg += "<div class='alert'>⚠️ Redémarrez le device pour que le WiFi AP utilise le nouveau nom.</div>";
+    msg += "<div class='alert'>⚠️ Redémarrez la station pour que le WiFi utilise le nouveau nom.</div>";
     msg += "<br><a href='/' class='btn'>Retour au menu</a>";
     msg += "</div>";
     sendCommonHTML(msg);
   } else {
-    String form = "<div class='header'><h1>📝 Nom du Device</h1></div>";
+    String form = "<div class='header'><h1>📝 Nom de la Station</h1></div>";
     form += "<div class='content'>";
-    form += "<div class='alert'>Le nom du device est utilisé pour l'identificateur WiFi et MQTT.</div>";
+    form += "<div class='info-card'><strong>🔑 ID unique (fixe)</strong>" + deviceId + "</div>";
+    form += "<div class='alert'>Le nom permet d'identifier facilement votre station. L'ID unique garantit qu'il n'y aura pas de collision de données.</div>";
     form += "<form action='/setDeviceName' method='get'>";
-    form += "<label><strong>Nouveau nom (max 32 caractères) :</strong></label>";
+    form += "<label><strong>Nom de la station (max 32 caractères) :</strong></label>";
     form += "<input type='text' name='name' maxlength='32' value='" + cfg.deviceName + "' required>";
     form += "<br><br><input type='submit' value='💾 Enregistrer'>";
     form += "</form>";
@@ -1242,6 +1588,19 @@ void handleSetMQTT() {
     String form = "<div class='header'><h1>📡 Configuration MQTT</h1></div>";
     form += "<div class='content'>";
     form += "<div class='alert'>Configurez le serveur MQTT pour la transmission des données.</div>";
+
+    // Afficher les credentials MQTT (lecture seule, générés à partir du MAC)
+    form += "<h2>🔐 Identifiants MQTT</h2>";
+    form += "<div class='alert' style='background:#E8F5E9;border-left-color:#4CAF50;'>";
+    form += "Ces identifiants sont générés automatiquement à partir du MAC de l'ESP32.<br>";
+    form += "Ils sont uniques et non modifiables. Ajoutez-les à votre serveur MQTT.";
+    form += "</div>";
+    form += "<div class='info-grid'>";
+    form += "<div class='info-card'><strong>👤 Utilisateur</strong><code style='font-size:1.1em;background:#f0f0f0;padding:5px 10px;border-radius:5px;'>" + mqtt_user + "</code></div>";
+    form += "<div class='info-card'><strong>🔑 Mot de passe</strong><code style='font-size:1.1em;background:#f0f0f0;padding:5px 10px;border-radius:5px;word-break:break-all;'>" + mqtt_pass + "</code></div>";
+    form += "</div>";
+
+    form += "<h2>⚙️ Serveur MQTT</h2>";
     form += "<form action='/setMQTT' method='get'>";
     form += "<label><strong>Serveur MQTT :</strong></label>";
     form += "<input type='text' name='server' value='" + cfg.mqtt_server + "' required>";
@@ -1259,7 +1618,7 @@ void handleUpdatePage() {
   String content = "<div class='header'><h1>⬆️ Mise à Jour Firmware</h1></div>";
   content += "<div class='content'>";
   content += "<div class='alert'>📦 Version actuelle : <strong>" + String(FIRMWARE_VERSION) + "</strong></div>";
-  content += "<div class='alert'>⚠️ Attention : Ne débranchez pas le device pendant la mise à jour !</div>";
+  content += "<div class='alert'>⚠️ Attention : Ne débranchez pas la station pendant la mise à jour !</div>";
   content += "<form method='POST' action='/update' enctype='multipart/form-data'>";
   content += "<label><strong>Sélectionnez le fichier .bin :</strong></label><br><br>";
   content += "<input type='file' name='update' accept='.bin' required>";
@@ -1267,6 +1626,62 @@ void handleUpdatePage() {
   content += "</form>";
   content += "<br><a href='/' class='btn'>Retour</a>";
   content += "</div>";
+  sendCommonHTML(content);
+}
+
+void handleFotaPage() {
+  // Reset du compteur NVS si demandé
+  if (server.hasArg("resetretry") && server.arg("resetretry") == "1") {
+    fotaNvsResetRetry();
+    Serial.println("[FOTA] Compteur NVS remis a zero depuis interface web");
+  }
+
+  const FotaState& state = fotaGetState();
+  String content = "<div class='header'><h1>FOTA NB-IoT</h1></div><div class='content'>";
+  content += "<div class='alert'>📦 Version actuelle : <strong>" + String(FIRMWARE_VERSION) + "</strong></div>";
+
+  // Dernier essai
+  content += "<h2>Dernier essai FOTA</h2><div class='info-grid'>";
+  content += "<div class='info-card'><strong>Résultat</strong>"
+           + String(fotaResultToString(state.lastResult)) + "</div>";
+  content += "<div class='info-card'><strong>URL</strong>"
+           + (state.lastUrl.length() > 0 ? state.lastUrl : "(aucun)") + "</div>";
+  content += "<div class='info-card'><strong>Taille</strong>"
+           + String(state.lastSize) + " octets</div>";
+  content += "<div class='info-card'><strong>Progression</strong>"
+           + String(state.progressPercent) + "%</div>";
+  content += "</div>";
+
+  // Déclenchement via MQTT
+  content += "<h2>Déclenchement via MQTT</h2>";
+  content += "<div class='alert'>Publiez un message <strong>retained</strong> sur le topic :<br>";
+  content += "<code>" + mqtt_topic_cmd + "</code><br><br>";
+  content += "Format JSON :<br>";
+  content += "<code>{\"action\":\"ota\",\"url\":\"http://serveur/firmware.bin\",\"md5\":\"32hex\",\"size\":1234567}</code><br><br>";
+  content += "Le device le recevra au prochain réveil MQTT.</div>";
+
+  // Compteur NVS
+  content += "<h2>Compteur tentatives NVS</h2><div class='info-grid'>";
+  if (safePreferencesBegin(true)) {
+    content += "<div class='info-card'><strong>URL stockée</strong>"
+             + preferences.getString("fota_url", "(aucune)") + "</div>";
+    content += "<div class='info-card'><strong>Tentatives</strong>"
+             + String(preferences.getUChar("fota_retry", 0)) + " / " + String(FOTA_MAX_RETRIES) + "</div>";
+    safePreferencesEnd();
+  } else {
+    content += "<div class='info-card'><strong>NVS</strong>Indisponible</div>";
+  }
+  content += "</div>";
+
+  // Reset compteur
+  content += "<form action='/fota' method='get'>";
+  content += "<input type='hidden' name='resetretry' value='1'>";
+  content += "<input type='submit' value='🔄 Remettre compteur à zéro'>";
+  content += "</form>";
+
+  content += "<br><div class='alert'>⚠️ La mise à jour est déclenchée uniquement via MQTT "
+             "en mode normal (NB-IoT actif), pas depuis cette page.</div>";
+  content += "<br><a href='/' class='btn'>Retour</a></div>";
   sendCommonHTML(content);
 }
 
@@ -1420,19 +1835,55 @@ void setupAPModeInit() {
   scale1.begin(dataPin1, clockPin1);
   scale2.begin(dataPin2, clockPin2);
 
-  // ✅ ReadOnly suffisant
+  // ✅ ReadOnly suffisant - Charger TOUTE la configuration
   if (!safePreferencesBegin(true)) {
     Serial.println("WARNING: Failed to read preferences in AP mode, using defaults");
     cfg.deviceName = "F7";
     cfg.mqtt_server = "ratamuse.hopto.org";
     cfg.mqtt_port = 1885;
+    cfg.factor1 = 1.0f;
+    cfg.factor2 = 1.0f;
+    cfg.offset1 = 0.0f;
+    cfg.offset2 = 0.0f;
   } else {
     cfg.deviceName = preferences.getString("deviceName", "F7");
     cfg.mqtt_server = preferences.getString("mqtt_server", "ratamuse.hopto.org");
     cfg.mqtt_port = preferences.getInt("mqtt_port", 1885);
+
+    // ✅ AJOUT : Charger les facteurs et offsets de calibration
+    float f1 = preferences.getFloat("factor1", 1.0);
+    float f2 = preferences.getFloat("factor2", 1.0);
+    float o1 = preferences.getFloat("offset1", 0.0);
+    float o2 = preferences.getFloat("offset2", 0.0);
+
+    cfg.factor1 = isValidFactor(f1) ? f1 : 1.0f;
+    cfg.factor2 = isValidFactor(f2) ? f2 : 1.0f;
+    cfg.offset1 = isValidFloat(o1) ? o1 : 0.0f;
+    cfg.offset2 = isValidFloat(o2) ? o2 : 0.0f;
+
     safePreferencesEnd();
   }
 
+  // ✅ AJOUT : Configurer les balances avec les facteurs et offsets de calibration
+  scale1.set_scale(cfg.factor1);
+  scale1.set_offset((int32_t)cfg.offset1);
+  scale2.set_scale(cfg.factor2);
+  scale2.set_offset((int32_t)cfg.offset2);
+
+  // Générer l'ID unique du device (basé sur eFuse MAC)
+  deviceId = getDeviceId();
+  Serial.println("Device ID: " + deviceId);
+
+  // Générer les credentials MQTT uniques (basés sur eFuse MAC)
+  generateMQTTCredentials(mqtt_user, mqtt_pass);
+  Serial.println("MQTT User: " + mqtt_user);
+  Serial.println("MQTT Pass: " + mqtt_pass);
+
+  Serial.println("=== Configuration AP Mode ===");
+  Serial.printf("Factor1: %.6f, Offset1: %.6f\n", cfg.factor1, cfg.offset1);
+  Serial.printf("Factor2: %.6f, Offset2: %.6f\n", cfg.factor2, cfg.offset2);
+
+  // Utiliser deviceName pour le SSID WiFi (plus lisible)
   String ssid = String(ssidPrefix) + cfg.deviceName;
   WiFi.softAP(ssid.c_str(), password1);
   Serial.println("SoftAP created: " + ssid);
@@ -1516,6 +1967,7 @@ void setupAPModeInit() {
   );
 
   server.on("/update", HTTP_GET, handleUpdatePage);
+  server.on("/fota",   HTTP_GET, handleFotaPage);   // v1.0.13 FOTA NB-IoT
 
   server.begin();
   setupComplete = true;
@@ -1595,8 +2047,15 @@ void setupNormalInit() {
   vTaskDelay(50 / portTICK_PERIOD_MS);
   ledratamuse();
 
-  uint64_t chipid = ESP.getEfuseMac();
-  mqtt_client_id = "device-" + String((uint32_t)(chipid & 0xFFFFFFFF), HEX);
+  // Générer l'ID unique du device (basé sur eFuse MAC)
+  deviceId = getDeviceId();
+  mqtt_client_id = "device-" + deviceId;
+  Serial.println("Device ID: " + deviceId);
+
+  // Générer les credentials MQTT uniques (basés sur eFuse MAC)
+  generateMQTTCredentials(mqtt_user, mqtt_pass);
+  Serial.println("MQTT User: " + mqtt_user);
+  Serial.println("MQTT Pass: " + mqtt_pass);
 
   if (!safeModemStart()) {
     Serial.println("Modem failed init");
@@ -1605,20 +2064,25 @@ void setupNormalInit() {
 
   loadConfigSafe();
 
-  mqtt_topic_temp1 = cfg.deviceName + "/<>/temp1/<>/data/0";
-  mqtt_topic_scaleA = cfg.deviceName + "/<>/scaleA/<>/data/0";
-  mqtt_topic_scaleB = cfg.deviceName + "/<>/scaleB/<>/data/0";
-  mqtt_topic_battery = cfg.deviceName + "/<>/battery/<>/data/0";
-  mqtt_topic_signal = cfg.deviceName + "/<>/signal/<>/data/0";
-  mqtt_topic_position = cfg.deviceName + "/<>/position/<>/data/0";
-  mqtt_topic_position_approx = cfg.deviceName + "/<>/posap/<>/data/0";
-  mqtt_topic_diagnostics = cfg.deviceName + "/<>/diagnostics/<>/data/0";
+  // Topics MQTT : deviceId (unique) + deviceName (lisible)
+  // Format: A1B2C3D4E5F6/F7/<>/temp1/<>/data/0
+  mqtt_topic_temp1 = deviceId + "/" + cfg.deviceName + "/<>/temp1/<>/data/0";
+  mqtt_topic_scaleA = deviceId + "/" + cfg.deviceName + "/<>/scaleA/<>/data/0";
+  mqtt_topic_scaleB = deviceId + "/" + cfg.deviceName + "/<>/scaleB/<>/data/0";
+  mqtt_topic_battery = deviceId + "/" + cfg.deviceName + "/<>/battery/<>/data/0";
+  mqtt_topic_signal = deviceId + "/" + cfg.deviceName + "/<>/signal/<>/data/0";
+  mqtt_topic_position = deviceId + "/" + cfg.deviceName + "/<>/position/<>/data/0";
+  mqtt_topic_position_approx = deviceId + "/" + cfg.deviceName + "/<>/posap/<>/data/0";
+  mqtt_topic_diagnostics = deviceId + "/" + cfg.deviceName + "/<>/diagnostics/<>/data/0";
+  mqtt_topic_cmd         = deviceId + "/cmd";  // Commandes FOTA
 
   scale1.begin(dataPin1, clockPin1);
   scale1.set_scale(cfg.factor1);
+  scale1.set_offset((int32_t)cfg.offset1);
   vTaskDelay(50 / portTICK_PERIOD_MS);
   scale2.begin(dataPin2, clockPin2);
   scale2.set_scale(cfg.factor2);
+  scale2.set_offset((int32_t)cfg.offset2);
   vTaskDelay(50 / portTICK_PERIOD_MS);
 
   sensor.begin();
@@ -1660,9 +2124,9 @@ void mainLoop() {
   }
   
   if (scale1.is_ready()) {
-    float raw = scale1.read_average(10);
-    if (isValidFloat(raw) && cfg.factor1 != 0.0f) {
-      scaleA = (int)((raw - cfg.offset1) / cfg.factor1);
+    float wA = scale1.get_units(10);
+    if (isValidFloat(wA)) {
+      scaleA = (int)round(wA);
       if (!isValidWeight(scaleA)) {
         Serial.printf("WARNING: Scale A weight out of range: %d\n", scaleA);
         recordCrash("scale_A_invalid");
@@ -1680,11 +2144,11 @@ void mainLoop() {
     }
     vTaskDelay(100 / portTICK_PERIOD_MS);
   }
-  
+
   if (scale2.is_ready()) {
-    float raw = scale2.read_average(10);
-    if (isValidFloat(raw) && cfg.factor2 != 0.0f) {
-      scaleB = (int)((raw - cfg.offset2) / cfg.factor2);
+    float wB = scale2.get_units(10);
+    if (isValidFloat(wB)) {
+      scaleB = (int)round(wB);
       if (!isValidWeight(scaleB)) {
         Serial.printf("WARNING: Scale B weight out of range: %d\n", scaleB);
         recordCrash("scale_B_invalid");
@@ -1749,16 +2213,152 @@ void mainLoop() {
   safePublish(mqtt_topic_signal, signal_str);
 
   // Publication diagnostics
-  StaticJsonDocument<256> diagDoc;
+  StaticJsonDocument<384> diagDoc;
   diagDoc["firmware"] = FIRMWARE_VERSION;
+  diagDoc["iccid"] = simICCID;
   diagDoc["crash_count"] = crashCount;
   diagDoc["last_crash_type"] = lastCrashType;
   diagDoc["nvs_corrupted"] = nvs_corrupted;
-  char diagBuffer[256];
+  char diagBuffer[384];
   serializeJson(diagDoc, diagBuffer);
   safePublish(mqtt_topic_diagnostics, diagBuffer);
 
   // ✅ Checkpoint 3 : Après publications
+  esp_task_wdt_reset();
+
+  // ---- Vérification commande FOTA (topic retained) ----
+  mqtt.subscribe(mqtt_topic_cmd.c_str());
+  unsigned long fotaWait = millis();
+  while (millis() - fotaWait < 3000) {   // 3s pour recevoir le retained
+    mqtt.loop();
+    esp_task_wdt_reset();
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+    if (fotaPending || resetPending) break;
+  }
+  mqtt.unsubscribe(mqtt_topic_cmd.c_str());
+
+  // ---- Commande RESET : remet à zéro crash_count et fota_retry en NVS ----
+  if (resetPending) {
+    resetPending = false;
+    Serial.println("[CMD] === Reset compteurs NVS ===");
+
+    // Remise à zéro crash_count
+    if (safePreferencesBegin(false)) {
+      preferences.putUInt("crash_count", 0);
+      preferences.putString("last_crash_type", "none");
+      safePreferencesEnd();
+      crashCount = 0;
+      lastCrashType = "none";
+      Serial.println("[CMD] crash_count remis a 0");
+    }
+
+    // Remise à zéro compteur tentatives FOTA
+    fotaNvsResetRetry();
+    Serial.println("[CMD] fota_retry remis a 0");
+
+    // Supprimer le retained /cmd pour ne pas re-déclencher
+    mqtt.publish(mqtt_topic_cmd.c_str(), (const uint8_t*)"", 0, true);
+
+    String ackJson = "{\"status\":\"counters_reset\",\"firmware\":\"" + String(FIRMWARE_VERSION) + "\"}";
+    mqtt.publish((mqtt_topic_cmd + "/ack").c_str(),
+                 (uint8_t*)ackJson.c_str(), ackJson.length(), false);
+    vTaskDelay(300 / portTICK_PERIOD_MS);
+    Serial.println("[CMD] Compteurs remis a zero, cycle continue normalement");
+  }
+
+  // ---- Commande SET_CONFIG : change serveur et/ou port MQTT en NVS puis redémarre ----
+  if (configPending) {
+    configPending = false;
+    Serial.println("[CMD] === set_config : mise a jour config MQTT ===");
+
+    if (safePreferencesBegin(false)) {
+      if (pendingMqttPort >= 1 && pendingMqttPort <= 65535) {
+        preferences.putInt("mqtt_port", pendingMqttPort);
+        cfg.mqtt_port = pendingMqttPort;
+        Serial.printf("[CMD] Nouveau port %d sauvegarde\n", pendingMqttPort);
+      }
+      if (pendingMqttServer.length() > 0) {
+        preferences.putString("mqtt_server", pendingMqttServer);
+        cfg.mqtt_server = pendingMqttServer;
+        Serial.printf("[CMD] Nouveau serveur \"%s\" sauvegarde\n", pendingMqttServer.c_str());
+      }
+      safePreferencesEnd();
+    } else {
+      Serial.println("[CMD] ERREUR: impossible d'ecrire en NVS, config inchangee");
+    }
+
+    // Effacer le retained /cmd pour ne pas re-declencher apres reboot
+    mqtt.publish(mqtt_topic_cmd.c_str(), (const uint8_t*)"", 0, true);
+
+    String ackJson = "{\"action\":\"set_config\",\"status\":\"ok\","
+                     "\"port\":"    + String(cfg.mqtt_port) +
+                     ",\"server\":\"" + cfg.mqtt_server + "\""
+                     ",\"firmware\":\"" + String(FIRMWARE_VERSION) + "\"}";
+    mqtt.publish((mqtt_topic_cmd + "/ack").c_str(),
+                 (uint8_t*)ackJson.c_str(), ackJson.length(), false);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    Serial.println("[CMD] Redemarrage pour appliquer la nouvelle config...");
+    safeRebootWithReason("set_config");
+  }
+
+  if (fotaPending) {
+    fotaPending = false;
+    Serial.println("[FOTA] === Commande OTA recue ===");
+
+    uint8_t retries = fotaNvsGetRetryCount(fotaUrl);
+    Serial.printf("[FOTA] Tentative %u / %d\n", retries + 1, FOTA_MAX_RETRIES);
+
+    if (retries >= FOTA_MAX_RETRIES) {
+      Serial.printf("[FOTA] Max retries atteint (%d)\n", FOTA_MAX_RETRIES);
+      String ackJson = "{\"status\":\"max_retries\",\"url\":\"" + fotaUrl + "\"}";
+      mqtt.publish((mqtt_topic_cmd + "/ack").c_str(), ackJson.c_str());
+      // Supprimer le retained pour éviter une boucle infinie
+      mqtt.publish(mqtt_topic_cmd.c_str(), (const uint8_t*)"", 0, true);
+      mqtt.setCallback(NULL);
+    } else {
+      fotaNvsIncrementRetry(fotaUrl);
+
+      // Fermer MQTT + TCP mux0 avant fotaExecute
+      mqtt.disconnect();
+      client.stop();
+      mqtt.setCallback(NULL);
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+
+      // Purger le buffer série du modem
+      while (modem.stream.available()) modem.stream.read();
+      vTaskDelay(200 / portTICK_PERIOD_MS);
+
+      FotaResult result = fotaExecute(fotaUrl, fotaMd5, fotaExpectedSize);
+      Serial.printf("[FOTA] Résultat : %s\n", fotaResultToString(result));
+
+      // Purger avant reconnexion MQTT
+      while (modem.stream.available()) modem.stream.read();
+      vTaskDelay(300 / portTICK_PERIOD_MS);
+
+      // Reconnecter MQTT pour publier l'ack
+      if (safeMQTTConnect()) {
+        String ackJson = "{\"status\":\"" + String(fotaResultToString(result))
+                       + "\",\"url\":\"" + fotaUrl
+                       + "\",\"firmware\":\"" + String(FIRMWARE_VERSION) + "\"}";
+        mqtt.publish((mqtt_topic_cmd + "/ack").c_str(),
+                     (uint8_t*)ackJson.c_str(), ackJson.length(), false);
+
+        if (result == FOTA_OK) {
+          // Supprimer le retained pour ne pas re-déclencher au prochain boot
+          mqtt.publish(mqtt_topic_cmd.c_str(), (const uint8_t*)"", 0, true);
+          fotaNvsResetRetry();
+          vTaskDelay(500 / portTICK_PERIOD_MS);
+          mqtt.disconnect();
+          vTaskDelay(300 / portTICK_PERIOD_MS);
+          Serial.println("[FOTA] Succes — redémarrage...");
+          esp_restart();
+        }
+      }
+    }
+  } else {
+    mqtt.setCallback(NULL);
+  }
+  // ---- Fin du bloc FOTA ----
   esp_task_wdt_reset();
 
   // GPS (si plage horaire)
@@ -1859,7 +2459,7 @@ void setup() {
   };
   esp_task_wdt_init(&wdt_config);
 
-  xTaskCreatePinnedToCore(appTask, "appTask", 10000, NULL, 1, &appTaskHandle, 0);
+  xTaskCreatePinnedToCore(appTask, "appTask", 20000, NULL, 1, &appTaskHandle, 0);
 
   if (appTaskHandle) esp_task_wdt_add(appTaskHandle);
 
