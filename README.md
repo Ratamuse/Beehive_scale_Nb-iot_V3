@@ -38,8 +38,7 @@ Cette carte embarque :
 - un **GPS**
 - une **carte SD** pour le stockage local des données
 
-Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
-Une sonde **DS18B20** (température) ou **SHT41** (température et humidité) peut être ajoutée pour mesurer les conditions à l’extérieur du boîtier, voire à l’intérieur de la ruche.
+Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.
 
 Pour faciliter les branchements, un **circuit imprimé dédié** est disponible en **2 versions** :
 
@@ -50,7 +49,9 @@ sur une même station.
 
 Il comprend également :
 
-- tous les connecteurs nécessaires (balances, sonde, bouton Wi-Fi, ON/OFF, LED)
+- des connecteurs pour brancher une sonde **DS18B20** (température) ou **SHT41** (température et humidité), pour mesurer les conditions à l’extérieur du boîtier, voire à l’intérieur de la ruche
+- un connecteur pour brancher un **pluviomètre à augets basculants**
+- tous les autres connecteurs nécessaires (balances, bouton Wi-Fi, ON/OFF, LED)
 - un **watchdog externe** pour relancer la carte principale en cas de plantage
 - un **capteur gyroscopique** pour détecter un vol
 - un capteur **Bosch BME280** pour connaître la température, l’humidité à l’intérieur du boîtier et la pression atmosphérique
