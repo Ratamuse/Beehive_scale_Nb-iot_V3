@@ -63,7 +63,7 @@ Il comprend également :
 
 
 <p align="center">
-  <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="45%"/>
+  <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb%202.jpg" width="45%"/>
   <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="45%"/>
 </p>
 
@@ -80,8 +80,8 @@ Il comprend également :
 | Image | Composant | Description | Qté | Remarques |
 |:--:|---|---|:--:|---|
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO SIM7080G (LilyGO)** | Module principal NB-IoT + ESP32 | 1 | Communication + gestion énergie |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale — Version 2 canaux** | Interface capteurs de charge (2× HX711) | 1 | Jusqu’à 2 balances par station |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale — Version 4 canaux** | Interface capteurs de charge (4× HX711) | 1 | Jusqu’à 4 balances par station |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb%202.jpg" width="80"/> | **PCB Beehive_Scale — Version 2 canaux** | Interface capteurs de charge (2× HX711) | 1 | Jusqu’à 2 balances par station |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb%204.jpg" width="80"/> | **PCB Beehive_Scale — Version 4 canaux** | Interface capteurs de charge (4× HX711) | 1 | Jusqu’à 4 balances par station |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989777.png" width="80"/> | **Bornier Phoenix 1989777 (5 broches)** | Connexions capteurs | 2 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989816.png" width="80"/> | **Bornier Phoenix 1989816 (9 broches)** | Connexions capteurs | 1 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Reset / calibration | 2 | Étanches IP67 |
