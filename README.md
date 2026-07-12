@@ -52,7 +52,7 @@ Il comprend également :
 - des connecteurs pour brancher une sonde **DS18B20** (température) ou **SHT41** (température et humidité), pour mesurer les conditions à l’extérieur du boîtier, voire à l’intérieur de la ruche
 - un connecteur pour brancher un **pluviomètre à augets basculants**
 - tous les autres connecteurs nécessaires (balances, bouton Wi-Fi, ON/OFF, LED)
-- un **watchdog externe** pour relancer la carte principale en cas de plantage
+- un **Attiny202** servant de watchdog à l'**ESP32-S3** en cas de plantage, et de compteur pour le pluviomètre
 - un **capteur gyroscopique** pour détecter un vol
 - un capteur **Bosch BME280** pour connaître la température, l’humidité à l’intérieur du boîtier et la pression atmosphérique
 - un module **RTC (temps réel)** permettant de connecter en **Bluetooth** plusieurs stations esclaves à une station maîtresse sur un même rucher, une seule carte SIM étant ainsi nécessaire par rucher
@@ -275,6 +275,9 @@ Toutes les données peuvent être :
 - ☁️ Ou hébergées **dans le cloud** via un prestataire pour un accès distant et sécurisé.  
 
 Cette architecture flexible permet d’**adapter le système** à différents besoins, tout en gardant la possibilité d’une **supervision centralisée ou locale**.
+
+🌍 Un **site internet** est également disponible pour recevoir et visualiser vos données : gratuit pour les fonctionnalités de base, et environ **20 €** pour l'accès à toutes les fonctionnalités (essai gratuit de **15 jours**).  
+👉 [monrucher.ratamuse.fr](https://monrucher.ratamuse.fr)
 
 
 
