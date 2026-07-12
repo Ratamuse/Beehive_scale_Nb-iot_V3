@@ -39,7 +39,7 @@ Cette carte embarque :
 - une **carte SD** pour le stockage local des données
 
 Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
-Une sonde de température **DS18B20** complète l’ensemble.
+Une sonde **DS18B20** (température) ou **SHT41** (température et humidité) peut être ajoutée pour mesurer les conditions à l’extérieur du boîtier, voire à l’intérieur de la ruche.
 
 Pour faciliter les branchements, un **circuit imprimé dédié** est disponible en **2 versions** :
 
