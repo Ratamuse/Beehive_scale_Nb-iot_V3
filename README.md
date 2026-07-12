@@ -36,15 +36,25 @@ Cette carte embarque :
 - un modem **NB-IoT SIM7080G**
 - un **chargeur solaire** pour batterie **18650 Li-Ion**
 - un **GPS**
+- une **carte SD** pour le stockage local des données
 
-Deux balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
+Les balances sont branchées à la TTGO via des convertisseurs **ADC 24 bits HX711**.  
 Une sonde de température **DS18B20** complète l’ensemble.
 
-Pour faciliter les branchements, un **circuit imprimé dédié** est disponible. Il comprend :
+Pour faciliter les branchements, un **circuit imprimé dédié** est disponible en **2 versions** :
 
-- 2 convertisseurs **HX711**
+- une version à **2 convertisseurs HX711**, pour brancher jusqu’à **2 balances**
+- une version à **4 convertisseurs HX711**, pour brancher jusqu’à **4 balances**
+
+sur une même station.
+
+Il comprend également :
+
 - tous les connecteurs nécessaires (balances, sonde, bouton Wi-Fi, ON/OFF, LED)
 - un **watchdog externe** pour relancer la carte principale en cas de plantage
+- un **capteur gyroscopique** pour détecter un vol
+- un capteur **Bosch BME280** pour connaître la température, l’humidité à l’intérieur du boîtier et la pression atmosphérique
+- un module **RTC (temps réel)** permettant de connecter en **Bluetooth** plusieurs stations esclaves à une station maîtresse sur un même rucher, une seule carte SIM étant ainsi nécessaire par rucher
 
 👉 Ce circuit imprimé est à souder sur la carte **TTGO SIM7080G**.
 
@@ -69,7 +79,8 @@ Pour faciliter les branchements, un **circuit imprimé dédié** est disponible.
 | Image | Composant | Description | Qté | Remarques |
 |:--:|---|---|:--:|---|
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/TTGO_SIM7080G.jpg" width="80"/> | **Carte TTGO SIM7080G (LilyGO)** | Module principal NB-IoT + ESP32 | 1 | Communication + gestion énergie |
-| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale** | Interface capteurs de charge | 1 | Spécifique au projet |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale — Version 2 canaux** | Interface capteurs de charge (2× HX711) | 1 | Jusqu’à 2 balances par station |
+| <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/pcb.jpg" width="80"/> | **PCB Beehive_Scale — Version 4 canaux** | Interface capteurs de charge (4× HX711) | 1 | Jusqu’à 4 balances par station |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989777.png" width="80"/> | **Bornier Phoenix 1989777 (5 broches)** | Connexions capteurs | 2 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/Phoenix%201989816.png" width="80"/> | **Bornier Phoenix 1989816 (9 broches)** | Connexions capteurs | 1 | À souder sur le PCB |
 | <img src="https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/raw/main/Balance%20Nb_iot/images/push%20button.png" width="80"/> | **Boutons poussoirs 12 mm** | Reset / calibration | 2 | Étanches IP67 |
