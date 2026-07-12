@@ -221,6 +221,7 @@ Il comprend également :
 ### 🔌 Fichiers PCB
 
 - **Dossier PCB (schémas + gerbers + BOM)**  
+Ancien modèle, 2 balances, un attiny202 pour le watchdog
   👉 https://github.com/Ratamuse/Beehive_scale_Nb-iot_V3/tree/main/Balance%20Nb_iot/PCB
 
 ### 🧩 Fichiers STL pour impression 3D
@@ -252,7 +253,7 @@ La **balance connectée** communique via un **serveur web embarqué** et envoie 
 
 Les données envoyées par MQTT comprennent :
 
-- ⚖️ **Poids** : mesures des deux balances  
+- ⚖️ **Poids** : mesures des deux ou quatre balances  
 - 🌡️ **Température** : température ambiante mesurée par la sonde DS18B20  
 - 🔋 **Batterie** : pourcentage de charge de la batterie interne  
 - 📶 **Signal NB-IoT** : force du signal réseau  
@@ -276,7 +277,7 @@ Toutes les données peuvent être :
 
 Cette architecture flexible permet d’**adapter le système** à différents besoins, tout en gardant la possibilité d’une **supervision centralisée ou locale**.
 
-🌍 Un **site internet** est également disponible pour recevoir et visualiser vos données : gratuit pour les fonctionnalités de base, et environ **20 €** pour l'accès à toutes les fonctionnalités (essai gratuit de **15 jours**).  
+🌍 Un **site internet** est également disponible pour recevoir et visualiser vos données : gratuit pour les fonctionnalités de base, et entre **20 et 30€** par an pour l'accès à toutes les fonctionnalités (essai gratuit de **15 jours**). 
 👉 [monrucher.ratamuse.fr](https://monrucher.ratamuse.fr)
 
 
